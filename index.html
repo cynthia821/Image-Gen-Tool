@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T&F · Image Workflow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #141414;
+  --surface:   #1c1c1c;
+  --surface2:  #212121;
+  --hover:     #282828;
+  --border:    #2e2e2e;
+  --border2:   #252525;
+  --text:      #e2e2e2;
+  --text2:     #a0a0a0;
+  --text3:     #858585;
+  --accent:    #5e6ad2;
+  /* Category colors — all verified ≥4.5:1 on their respective dark backgrounds */
+  --c-mkt-bg: #162413; --c-mkt: #6ebe60;
+  --c-des-bg: #111d2c; --c-des: #5cb8f0;
+  --c-dev-bg: #1a1130; --c-dev: #b08ae0;
+  --c-str-bg: #251a07; --c-str: #dba050;
+  --mono: 'JetBrains Mono','Fira Code','Courier New',monospace;
+}
+
+body {
+  font-family: 'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background: var(--bg); color: var(--text);
+  height: 100vh; display: flex; flex-direction: column;
+  overflow: hidden; font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── HEADER ── */
+header {
+  flex-shrink: 0; min-height: 52px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex; align-items: center; gap: 10px;
+  z-index: 20;
+  position: relative;
+}
+.brand { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
+.hdr-sep { color: var(--border); font-size: 15px; }
+.hdr-sub { font-size: 12px; color: var(--text3); }
+header .spacer { flex: 1; }
+.progress-pill {
+  font-size: 10px; color: var(--text3);
+  font-family: var(--mono);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 2px 8px;
+}
+.hdr-btn {
+  font-size: 11px; color: var(--text2);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 4px; padding: 8px 12px;
+  cursor: pointer; font-family: inherit; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.08s, color 0.08s;
+  white-space: nowrap;
+}
+.hdr-btn:hover { background: var(--hover); color: var(--text); border-color: var(--text3); }
+
+/* ── STYLE POPOVER ── */
+.style-popover {
+  position: absolute; top: 56px; right: 16px;
+  width: 560px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  z-index: 30; display: none; flex-direction: column;
+}
+.style-popover.open { display: flex; }
+.sp-head {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.sp-title { font-size: 11px; font-weight: 600; color: var(--text2); flex: 1; text-transform: uppercase; letter-spacing: 0.06em; }
+.sp-close {
+  background: none; border: none; cursor: pointer;
+  color: var(--text3); font-size: 14px; padding: 1px 4px; border-radius: 3px; line-height: 1;
+}
+.sp-close:hover { color: var(--text); background: var(--hover); }
+.sp-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.sp-row  { display: flex; gap: 10px; }
+.sp-col  { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.sp-col label { font-size: 10px; color: var(--text3); font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.sp-col textarea, .sp-col input {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 4px;
+  color: var(--text2); font-size: 11px; font-family: var(--mono);
+  padding: 8px 12px; outline: none; resize: vertical; line-height: 1.5;
+}
+.sp-col textarea:focus, .sp-col input:focus { border-color: var(--accent); color: var(--text); }
+#styleDesc { min-height: 60px; }
+
+/* Style reference image upload */
+.style-ref-zone {
+  border: 1px dashed var(--border); border-radius: 4px;
+  background: var(--bg); min-height: 80px;
+  padding: 8px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.12s, background 0.12s;
+}
+.style-ref-zone:hover { border-color: var(--text3); }
+.style-ref-zone.drag-over { border-color: var(--accent); background: rgba(94,106,210,0.06); }
+.style-ref-placeholder {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--text3); text-align: center;
+  padding: 12px 8px; pointer-events: none; line-height: 1.6;
+  user-select: none;
+}
+.style-ref-thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
+.style-ref-thumb {
+  position: relative; width: 60px; height: 60px; flex-shrink: 0;
+}
+.style-ref-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  border-radius: 3px; border: 1px solid var(--border);
+}
+.style-ref-del {
+  position: absolute; top: -5px; right: -5px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: var(--surface2); color: var(--text2);
+  border: 1px solid var(--border); cursor: pointer;
+  font-size: 8px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.08s, color 0.08s;
+  z-index: 2;
+}
+.style-ref-del:hover { background: #3a1010; color: #f08080; border-color: #6a2020; }
+
+/* Aspect ratio select */
+.sp-select {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text2); font-size: 11px;
+  font-family: inherit; padding: 8px 12px; outline: none; cursor: pointer;
+}
+.sp-select:focus { border-color: var(--accent); color: var(--text); }
+
+/* ── GALLERY MODAL ── */
+.gallery-modal {
+  position: fixed; inset: 0; z-index: 50;
+  background: rgba(0,0,0,0.82); backdrop-filter: blur(4px);
+  display: none; flex-direction: column;
+}
+.gallery-modal.open { display: flex; }
+.gallery-top {
+  height: 48px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 20px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+}
+.gallery-title { font-size: 13px; font-weight: 600; flex: 1; }
+.gallery-scroll { flex: 1; overflow-y: auto; padding: 20px; }
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.gal-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+  display: flex; flex-direction: column;
+  cursor: pointer; transition: border-color 0.1s;
+}
+.gal-card:hover { border-color: var(--text3); }
+.gal-img { position: relative; background: #0a0a09; line-height: 0; aspect-ratio: 16/9; overflow: hidden; }
+.gal-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.gal-empty {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3); font-size: 11px; aspect-ratio: 16/9;
+}
+.gal-info {
+  padding: 8px 10px;
+  display: flex; align-items: center; gap: 7px;
+}
+.gal-name { font-size: 11px; color: var(--text2); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gal-dl {
+  font-size: 10px; padding: 8px 12px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 3px; cursor: pointer; color: var(--text3);
+  font-family: inherit; white-space: nowrap;
+  transition: background 0.08s;
+}
+.gal-dl:hover { background: var(--hover); color: var(--text2); }
+.gal-dl:disabled { opacity: 0.25; cursor: default; }
+
+/* ── API BAR ── */
+.api-bar {
+  flex-shrink: 0; min-height: 46px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.api-lbl { font-size: 11px; color: var(--text3); white-space: nowrap; }
+.api-select {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text2); font-size: 11px;
+  font-family: inherit; padding: 8px 12px; outline: none; cursor: pointer;
+}
+.api-select:focus { border-color: var(--accent); }
+.key-wrap { position: relative; display: flex; align-items: center; flex: 1; max-width: 300px; }
+.key-input {
+  width: 100%; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; color: var(--text2); font-size: 11px;
+  font-family: var(--mono); padding: 8px 32px 8px 12px; outline: none;
+}
+.key-input::placeholder { color: var(--text3); }
+.key-input:focus { border-color: var(--accent); color: var(--text); }
+.key-eye {
+  position: absolute; right: 6px;
+  background: none; border: none; cursor: pointer;
+  font-size: 10px; color: var(--text3); padding: 1px;
+  line-height: 1;
+}
+.key-eye:hover { color: var(--text2); }
+.key-status { font-size: 10px; color: var(--text3); white-space: nowrap; }
+.key-status.ok { color: var(--c-mkt); }
+.api-bar .spacer { flex: 1; }
+
+/* ── LAYOUT ── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 320px; flex-shrink: 0;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  overflow-y: auto; display: flex; flex-direction: column;
+  scrollbar-gutter: stable;
+}
+.sb-search {
+  padding: 8px 8px 4px;
+  position: sticky; top: 0; background: var(--bg); z-index: 2;
+}
+.sb-search input {
+  width: 100%; padding: 8px 12px;
+  border: 1px solid var(--border); border-radius: 4px;
+  font-size: 12px; font-family: inherit;
+  background: var(--surface); color: var(--text); outline: none;
+}
+.sb-search input::placeholder { color: var(--text3); }
+.sb-search input:focus { border-color: var(--accent); }
+
+.cat-block { padding-top: 4px; padding-bottom: 4px; border-bottom: 1px solid var(--border2); }
+.cat-block:last-child { border-bottom: none; }
+.cat-hdr {
+  padding: 8px 12px;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text3);
+  display: flex; align-items: center; gap: 5px;
+  user-select: none; cursor: pointer;
+  transition: color 0.07s;
+}
+.cat-hdr:hover { color: var(--text2); }
+.cat-hdr-label { flex: 1; }
+.cat-n { font-weight: 400; text-transform: none; letter-spacing: 0; }
+.cat-chevron {
+  font-size: 7px; line-height: 1; color: var(--text3);
+  transition: transform 0.18s ease;
+  display: inline-block;
+}
+.cat-block.collapsed .cat-chevron { transform: rotate(-90deg); }
+.cat-items { overflow: hidden; }
+.cat-block.collapsed .cat-items { display: none; }
+.svc-item {
+  padding: 8px 10px 8px 14px;
+  margin: 0 4px;
+  font-size: 12px; cursor: pointer; color: var(--text2);
+  border-radius: 4px; line-height: 1.45;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.07s, color 0.07s;
+}
+.svc-item:hover  { background: var(--surface); color: var(--text); }
+.svc-item.active { background: var(--surface2); color: var(--text); font-weight: 500; }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.card-wrap {
+  max-width: 860px; width: 100%; margin: 0 auto;
+  padding: 20px 40px;
+  flex: 1; display: flex; flex-direction: column;
+  overflow: hidden; min-height: 0;
+}
+#serviceCard {
+  flex: 1; display: flex; flex-direction: column; min-height: 0;
+}
+
+/* ── SERVICE CARD ── */
+.svc-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+  flex: 1; display: flex; flex-direction: column;
+}
+
+/* Card head — lives outside .svc-card */
+.card-head { padding: 16px 20px 14px; }
+.card-meta { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; }
+.cat-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase; padding: 2px 8px; border-radius: 3px;
+}
+.cat-tag.marketing   { background: var(--c-mkt-bg); color: var(--c-mkt); }
+.cat-tag.design      { background: var(--c-des-bg); color: var(--c-des); }
+.cat-tag.development { background: var(--c-dev-bg); color: var(--c-dev); }
+.cat-tag.strategy    { background: var(--c-str-bg); color: var(--c-str); }
+.svc-type  { font-size: 11px; color: var(--text3); }
+.card-pos  { margin-left: auto; font-size: 10px; color: var(--text3); font-family: var(--mono); }
+.card-name { font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; line-height: 1.3; }
+.card-def  { font-size: 12px; color: var(--text2); line-height: 1.6; }
+.card-chips { display: flex; gap: 6px; margin-top: 10px; }
+.chip {
+  font-size: 10px; padding: 2px 9px; border-radius: 3px;
+  border: 1px solid var(--border); color: var(--text2);
+  font-weight: 500; background: var(--surface2);
+}
+
+/* ── CARD BODY — two-column layout ── */
+.card-body { display: flex; border-bottom: 1px solid var(--border2); min-height: 0; flex: 1; }
+.card-img-col {
+  flex: 0 0 340px;
+  border-right: 1px solid var(--border2);
+  display: flex; flex-direction: column;
+}
+.card-ctrl-col {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+/* Section header row */
+.sec-hdr {
+  padding: 8px 18px;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border2);
+}
+.sec-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text3); flex: 1;
+}
+.sec-actions { display: flex; gap: 5px; align-items: center; }
+.provider-tag { font-size: 10px; color: var(--text3); }
+
+/* ── BUTTONS ── */
+.btn {
+  font-size: 11px; padding: 8px 12px;
+  border-radius: 4px; border: 1px solid var(--border);
+  cursor: pointer; background: var(--surface2); color: var(--text2);
+  font-family: inherit; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 5px;
+  transition: background 0.08s, color 0.08s, border-color 0.08s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--hover); color: var(--text); border-color: var(--text3); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+.btn.accent:hover { opacity: 0.88; }
+.btn.green { background: var(--c-mkt-bg); color: var(--c-mkt); border-color: #1e3518; }
+/* Icon-only button — square padding, slightly larger glyph */
+.btn-icon { padding: 6px 8px; font-size: 14px; line-height: 1; }
+
+/* spinner */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1.5px solid rgba(226,226,226,0.2);
+  border-top-color: var(--text2);
+  animation: spin 0.75s linear infinite;
+  display: inline-block; flex-shrink: 0;
+}
+
+/* Image area — inside .card-img-col */
+.img-area { flex: 1; display: flex; flex-direction: column; }
+.img-body  { background: var(--bg); flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+.img-empty, .img-noapikey {
+  padding: 24px 16px; text-align: center;
+  color: var(--text3); font-size: 11px; line-height: 1.7;
+}
+.img-noapikey strong { color: var(--text2); }
+
+.img-gen-state {
+  padding: 32px 16px; text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.big-spin {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--text2);
+  animation: spin 0.9s linear infinite;
+}
+.gen-txt { font-size: 12px; color: var(--text2); }
+.gen-sub { font-size: 11px; color: var(--text3); }
+
+.img-result { position: relative; background: #0a0a09; line-height: 0; }
+.img-result img { width: 100%; height: auto; display: block; }
+.img-btns { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; }
+.ib {
+  font-size: 11px; padding: 8px 12px; border-radius: 3px;
+  border: none; cursor: pointer; font-weight: 500;
+  backdrop-filter: blur(8px); font-family: inherit;
+  transition: opacity 0.1s;
+}
+.ib:hover { opacity: 0.85; }
+.ib.dl    { background: rgba(226,226,226,0.9); color: #141414; }
+.ib.del   { background: rgba(90,15,15,0.88); color: #f0a0a0; }
+
+.img-error {
+  padding: 10px 14px; background: #180808;
+  border-top: 1px solid #3a1010;
+  color: #e07070; font-size: 11px; line-height: 1.6;
+}
+.img-error a { color: inherit; opacity: 0.65; }
+
+.upload-link { font-size: 10px; color: var(--text3); text-align: center; padding: 6px; border-top: 1px solid var(--border2); }
+.upload-link label { color: var(--text2); cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.upload-link input { display: none; }
+
+/* Prompt section — inside .card-ctrl-col */
+.prompt-sec { padding: 12px 16px 12px; border-bottom: 1px solid var(--border2); }
+.prompt-hdr { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+.prompt-hdr .sec-label { flex: 1; }
+
+.prompt-ta {
+  width: 100%; min-height: 140px;
+  padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 11px; font-family: var(--mono);
+  background: var(--bg); color: var(--text2);
+  resize: vertical; outline: none; line-height: 1.6;
+}
+.prompt-ta:focus { border-color: var(--accent); color: var(--text); }
+
+.preview-lbl-row {
+  display: flex; align-items: center; gap: 6px; margin: 10px 0 4px;
+}
+.preview-lbl {
+  font-size: 10px; color: var(--text3); font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase; flex: 1;
+}
+.preview-box {
+  width: 100%; min-height: 140px;
+  padding: 8px 10px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; font-size: 11px; font-family: var(--mono);
+  color: var(--text2); line-height: 1.6; resize: vertical; outline: none;
+}
+.preview-box:focus { border-color: var(--accent); color: var(--text); }
+
+/* Page footer — sticky to bottom of viewport as sibling of .layout */
+.page-footer {
+  flex-shrink: 0;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex; justify-content: space-between; align-items: center;
+  min-height: 50px;
+  z-index: 10;
+}
+.nav-b {
+  font-size: 11px; color: var(--text3); background: none; border: 1px solid transparent;
+  cursor: pointer; padding: 8px 12px; border-radius: 4px; font-family: inherit;
+  max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: background 0.07s, color 0.07s, border-color 0.07s;
+}
+.nav-b:hover { background: var(--hover); color: var(--text2); border-color: var(--border); }
+.nav-b:disabled { opacity: 0.2; cursor: default; }
+
+/* ── LIGHTBOX ── */
+.lightbox {
+  position: fixed; inset: 0; z-index: 60;
+  display: none; flex-direction: column;
+  background: rgba(0,0,0,0.96);
+}
+.lightbox.open { display: flex; }
+.lb-top {
+  height: 48px; flex-shrink: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.lb-info { flex: 1; display: flex; align-items: center; gap: 8px; }
+.lb-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.lb-of   { font-size: 11px; color: var(--text3); font-family: var(--mono); }
+.lb-img-wrap {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.lb-img-wrap img {
+  max-width: 100%; max-height: 100%;
+  object-fit: contain; border-radius: 4px;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.8);
+  cursor: default;
+}
+.lb-nav-btn {
+  width: 34px; height: 34px; border-radius: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-size: 16px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.08s, color 0.08s;
+}
+.lb-nav-btn:hover { background: var(--hover); color: var(--text); }
+.lb-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.lb-dl-btn {
+  font-size: 11px; padding: 8px 12px; border-radius: 4px;
+  background: var(--surface); border: 1px solid var(--border);
+  color: var(--text2); cursor: pointer; font-family: inherit; font-weight: 500;
+  transition: background 0.08s, color 0.08s;
+}
+.lb-dl-btn:hover { background: var(--hover); color: var(--text); }
+.lb-close-btn {
+  width: 34px; height: 34px; border-radius: 4px;
+  background: none; border: 1px solid var(--border);
+  color: var(--text3); cursor: pointer; font-size: 15px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: background 0.08s, color 0.08s;
+  margin-left: 4px;
+}
+.lb-close-btn:hover { background: var(--hover); color: var(--text); }
+
+/* per-card style override */
+.card-style-override { padding: 0 16px 12px; }
+.cso-toggle {
+  font-size: 10px; color: var(--text3); background: none; border: none;
+  cursor: pointer; font-family: inherit; padding: 0;
+  text-decoration: underline; text-underline-offset: 2px;
+}
+.cso-toggle:hover { color: var(--text2); }
+.cso-body { margin-top: 8px; display: none; }
+.cso-body.open { display: block; }
+.cso-body textarea {
+  width: 100%; min-height: 52px;
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;
+  font-size: 11px; font-family: var(--mono);
+  background: var(--bg); color: var(--text2);
+  resize: vertical; outline: none; line-height: 1.5;
+}
+.cso-body textarea:focus { border-color: var(--accent); color: var(--text); }
+.cso-lbl { font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <span class="brand">T&F</span>
+  <span class="hdr-sep">/</span>
+  <span class="hdr-sub">Image Workflow</span>
+  <div class="spacer"></div>
+  <span class="progress-pill" id="progressPill">0 / 57 generated</span>
+  <button class="hdr-btn" onclick="toggleStylePopover()">Style ↕</button>
+  <button class="hdr-btn" onclick="openGallery()">Gallery</button>
+</header>
+
+<!-- STYLE POPOVER -->
+<div class="style-popover" id="stylePopover">
+  <div class="sp-head">
+    <span class="sp-title">Global Style Reference</span>
+    <button class="sp-close" onclick="toggleStylePopover()">✕</button>
+  </div>
+  <div class="sp-body">
+    <div class="sp-col">
+      <label>Visual Style — appended to every prompt</label>
+      <textarea id="styleDesc" oninput="updatePreview()">Flat illustration style, bold saturated colors, conceptual metaphorical scene, wide panoramic cinematic crop (approximately 2:1 aspect ratio), clean bold outlines, vibrant blues greens oranges and reds, figures shown from dynamic or unexpected perspectives (worm's eye, from behind, elevated), graphic novel aesthetic, no text or typography in image</textarea>
+    </div>
+    <div class="sp-row">
+      <div class="sp-col" style="flex:2">
+        <label>Style Reference</label>
+        <div class="style-ref-zone" id="styleRefZone"
+             onclick="styleRefZoneClick(event)"
+             ondragover="styleRefDragOver(event)"
+             ondragleave="styleRefDragLeave(event)"
+             ondrop="styleRefDrop(event)">
+          <input type="file" id="styleRefInput" accept="image/*" multiple
+                 style="display:none" onchange="addStyleRefImages(this.files); this.value=''">
+          <div class="style-ref-thumbs" id="styleRefThumbs"></div>
+          <div class="style-ref-placeholder" id="styleRefPlaceholder">
+            Click or drag &amp; drop images here
+          </div>
+        </div>
+      </div>
+      <div class="sp-col" style="flex:0 0 160px">
+        <label>Aspect Ratio</label>
+        <select id="aspectRatio" class="sp-select" onchange="updatePreview()">
+          <option value="landscape_16_9" selected>16:9 — Landscape</option>
+          <option value="landscape_4_3">4:3 — Landscape</option>
+          <option value="square_hd">1:1 — Square HD</option>
+          <option value="square">1:1 — Square</option>
+          <option value="portrait_4_3">3:4 — Portrait</option>
+          <option value="portrait_16_9">9:16 — Portrait</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GALLERY MODAL -->
+<div class="gallery-modal" id="galleryModal">
+  <div class="gallery-top">
+    <span class="gallery-title">All Generated Images</span>
+    <button class="hdr-btn" onclick="bulkDownload()">↓ Download All</button>
+    <button class="hdr-btn" onclick="closeGallery()">✕ Close</button>
+  </div>
+  <div class="gallery-scroll">
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-top">
+    <button class="lb-nav-btn" id="lbPrevBtn" onclick="lbNav(-1)">←</button>
+    <button class="lb-nav-btn" id="lbNextBtn" onclick="lbNav(1)">→</button>
+    <div class="lb-info">
+      <span class="lb-name" id="lbName"></span>
+      <span class="lb-of" id="lbOf"></span>
+    </div>
+    <button class="lb-dl-btn" id="lbDlBtn" onclick="lbDownload()">↓ Download</button>
+    <button class="lb-close-btn" onclick="closeLightbox()">✕</button>
+  </div>
+  <div class="lb-img-wrap">
+    <img id="lbImg" src="" alt="" onclick="event.stopPropagation()">
+  </div>
+</div>
+
+<!-- API BAR -->
+<div class="api-bar">
+  <span class="api-lbl">Provider</span>
+  <select class="api-select" id="apiProvider" onchange="onProviderChange()">
+    <option value="fal">fal.ai · FLUX Pro 1.1</option>
+    <option value="dalle">OpenAI · DALL·E 3</option>
+  </select>
+  <span class="api-lbl">API Key</span>
+  <div class="key-wrap">
+    <input class="key-input" id="apiKeyInput" type="password"
+           placeholder="Paste your API key and press Enter…"
+           oninput="onKeyInput()" onkeydown="if(event.key==='Enter')onKeyInput()"
+           autocomplete="off" spellcheck="false">
+    <button class="key-eye" onclick="toggleKeyVis()" title="Show/hide">👁</button>
+  </div>
+  <span class="key-status" id="keyStatus">No key set</span>
+  <div class="spacer"></div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sb-search">
+      <input type="text" id="searchInput" placeholder="Search…" oninput="filterServices(this.value)">
+    </div>
+    <div id="serviceNav"></div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="card-wrap">
+      <div id="serviceCard"></div>
+    </div>
+    <!-- PAGE FOOTER — sticky to bottom of workspace, never under sidebar -->
+    <div id="pageNav" class="page-footer"></div>
+  </main>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────────────
+const SERVICES = [
+  { id:1, cat:"Marketing", type:"Search & Authority", name:"Search Engine Optimization (SEO)",
+    def:"The improvement of organic visibility, search performance, technical health, and topical authority within search engines.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A lone figure walks a winding trail through a dense forest, a single beam of light cutting through the canopy to illuminate the path ahead. View from below looking up through the branches. The light guides the figure forward toward an open clearing. Bold greens and deep blues, patches of warm gold light filtering through leaves.`},
+
+  { id:2, cat:"Marketing", type:"Search & Authority", name:"AI Discovery Optimization",
+    def:"The optimization of content, technical structures, authority signals, and digital assets to improve visibility within AI-powered discovery platforms.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure stands at the convergence point of multiple glowing signal paths stretching toward the horizon, viewed from behind. The paths radiate outward like spokes, each pulsing with soft light. Abstract geometric nodes dot the landscape. Electric blues and purples blending into warm amber at the horizon.`},
+
+  { id:3, cat:"Marketing", type:"Search & Authority", name:"Technical SEO",
+    def:"The optimization of technical website infrastructure to improve crawlability, indexability, performance, and search visibility.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure examines a vast underground root system, crouching low with a lantern, the roots extending in all directions like an intricate architecture. View from ground level looking along the root network. Above ground, trees grow tall and strong. Deep earthy browns and warm greens, lantern light casting amber glow.`},
+
+  { id:4, cat:"Marketing", type:"Search & Authority", name:"Local SEO",
+    def:"The optimization of local visibility signals to improve discoverability within geographically targeted searches.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure places a glowing marker pin into a colorful neighborhood map spread across a table, seen from a high angle. Streets and buildings rendered in bold geometric shapes below. The marker emits a warm radiant glow. Vibrant neighborhood colors—oranges, greens, and blues—with one area clearly illuminated among the rest.`},
+
+  { id:5, cat:"Marketing", type:"Search & Authority", name:"Enterprise SEO",
+    def:"The management of SEO strategy and governance across large, complex digital ecosystems.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A single figure stands at the center of an enormous branching network of pathways that fan out across a vast landscape, viewed from slightly elevated. The paths form a massive tree-like structure stretching to the horizon. The figure is small against the scale. Deep blues and greens, with gold light tracing the main arteries.`},
+
+  { id:6, cat:"Marketing", type:"Paid Acquisition", name:"Search Engine Marketing (SEM)",
+    def:"The management and optimization of paid search campaigns across search advertising platforms.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure operates a focused spotlight from an elevated platform, its beam cutting through a crowded plaza below to illuminate a single precise spot. View from the side, slightly elevated. The crowd below is rendered in muted tones while the spotlight target glows warmly. Bold blues and oranges, dramatic contrast between shadow and light.`},
+
+  { id:7, cat:"Marketing", type:"Paid Acquisition", name:"Google Ads",
+    def:"Strategic planning, management, optimization, and reporting of campaigns within Google's advertising ecosystem.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure launches a perfectly aimed paper airplane toward a distant target glowing on the horizon, viewed from low behind them. The airplane trail traces a precise arc. Other abandoned planes rest on the ground around them. Wide blue sky, bold primary colors, sun low on the horizon casting long shadows.`},
+
+  { id:8, cat:"Marketing", type:"Paid Acquisition", name:"Microsoft Ads",
+    def:"Strategic planning, management, optimization, and reporting of campaigns within Microsoft's advertising ecosystem.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure on a small boat casts a wide net from an open body of water, viewed from a low angle at water level. The net spreads wide above them, catching morning light. Multiple distant shores are visible on the horizon. Calm blues and teals with warm morning gold, mist low on the water.`},
+
+  { id:9, cat:"Marketing", type:"Paid Acquisition", name:"Meta Ads",
+    def:"The planning, management, optimization, and reporting of advertising campaigns across Meta's advertising ecosystem.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure stands at a large window looking out at a crowd below, each person framed within their own glowing rectangle like a social post. The figure selects specific frames with a gesture. View from behind the figure. Bold coral and blue tones, the crowd rendered in soft illustration, the selected frames in vivid saturated color.`},
+
+  { id:10, cat:"Marketing", type:"Content Systems", name:"Content Marketing",
+    def:"The development of content programs that educate audiences, improve discoverability, and support conversion.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure tends to rows of growing plants in a vast garden, each plant at a different stage of growth. Some are seedlings, others are fully bloomed. The figure works methodically. Viewed from slightly elevated angle. Rich greens and warm soil tones, with bursts of color from blooming flowers. Sky overhead a deep clear blue.`},
+
+  { id:11, cat:"Marketing", type:"Content Systems", name:"Content Strategy",
+    def:"The planning and governance of content initiatives aligned to organizational objectives.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure unfolds a large architectural blueprint on the ground, the blueprint expanding to reveal a detailed landscape of content pathways and structures. Viewed from above and slightly behind the figure. Deep navy blues and cream, with warm orange highlights marking key routes.`},
+
+  { id:12, cat:"Marketing", type:"Content Systems", name:"Editorial Planning",
+    def:"The structured planning of content production, publication, and optimization efforts.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure arranges a grid of tiles across a large floor, each tile containing a different scene or image. They place each one thoughtfully, stepping back to view the whole pattern. Viewed from a high angle above looking down. Warm creams and terracottas, with each tile in a different vivid color.`},
+
+  { id:13, cat:"Marketing", type:"Content Systems", name:"Content Governance",
+    def:"The creation of standards, workflows, and processes that govern content creation and management.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure stands at a large control panel, organized channels of content flowing through structured pipes and pathways, each properly labeled and sorted. The system is orderly and purposeful. Viewed from a slight low angle. Deep greens and grays, amber indicator lights glowing at each checkpoint.`},
+
+  { id:14, cat:"Marketing", type:"Lifecycle & Retention", name:"Email Marketing",
+    def:"The use of email communications to nurture, engage, and retain audiences.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure stands at a large open window, releasing paper envelopes into a clear sky, each folding itself into a small plane and flying toward a different destination on the horizon. Viewed from behind and slightly below. Morning light, warm yellows and blues, the envelopes leaving colorful trails through the air.`},
+
+  { id:15, cat:"Marketing", type:"Lifecycle & Retention", name:"Marketing Automation",
+    def:"The automation of marketing communications and workflows.",
+    outcomes:["Continuity","Growth"],
+    prompt:`A figure sets the first domino in a long, intricate chain, the mechanism cascading through multiple stages in the background—each stage triggering the next automatically. Viewed from the side in a wide panoramic frame. The chain extends far into the distance. Warm ochres and deep blues, motion lines showing the cascade in progress.`},
+
+  { id:16, cat:"Marketing", type:"Conversion Systems", name:"Conversion Rate Optimization (CRO)",
+    def:"Structured experimentation and optimization focused on improving conversion performance.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure adjusts the aperture of a large funnel-shaped structure, widening the flow that passes through. Viewed from a low angle below the funnel. More passes through with each adjustment. Deep blues and warm amber, the material flowing through the funnel glowing golden as it reaches the output.`},
+
+  { id:17, cat:"Marketing", type:"Conversion Systems", name:"Landing Page Optimization",
+    def:"The optimization of landing page experiences to improve conversion performance.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure widens a gateway archway with their hands, the stream of visitors flowing through it more easily as the opening grows. Viewed from the side in a wide frame. The gateway is ornate and detailed. The crowd on the approaching side is large and dense. Warm stone tones, deep blue sky, figures in bold silhouette.`},
+
+  { id:18, cat:"Marketing", type:"Analytics & Optimization", name:"Analytics & Performance Measurement",
+    def:"The collection, interpretation, reporting, and optimization of performance data across digital initiatives.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure peers through a large telescope from an observation deck, the lens trained on a constellation of data points glowing in the night sky. Each star in the constellation is connected by thin lines forming patterns. Viewed from below looking up at the figure. Deep midnight blues and navy, golden star clusters, warm lantern light on the figure.`},
+
+  { id:19, cat:"Marketing", type:"Analytics & Optimization", name:"Attribution Analysis",
+    def:"The evaluation of marketing and digital touchpoints to understand performance contribution.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure traces glowing threads from multiple outcomes back through a complex network, following each path to its origin point. Viewed from above, the figure crouches over the web of threads spread across a large surface. The threads in various colors converge on clear origin points. Deep indigo background, threads in amber, red, and teal.`},
+
+  { id:20, cat:"Marketing", type:"Analytics & Optimization", name:"Reporting & Insights",
+    def:"The ongoing communication of performance trends, opportunities, and outcomes.",
+    outcomes:["Continuity","Growth"],
+    prompt:`A figure pulls back a large curtain to reveal an illuminated display of performance metrics and visualizations behind it. Viewed from the side. The display glows warmly against the surrounding dimness. Rich burgundy curtain, golden-lit display panel, the figure silhouetted against the light.`},
+
+  { id:21, cat:"Design", type:"Web Design", name:"Website Design",
+    def:"The design of website experiences that communicate value, guide users, and support organizational goals.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure sculpts a large luminous window from raw material, the window opening onto a beautifully organized world within. Viewed from behind and slightly to the side. The contrast between the rough exterior and the carefully crafted view through the window is striking. Cool blues and grays outside, warm vivid scene within the window frame.`},
+
+  { id:22, cat:"Design", type:"Web Design", name:"Prototyping",
+    def:"The creation of interactive or visual design models that help stakeholders evaluate experience and functionality before development.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure examines a series of small-scale architectural models on a long table, each at a different stage of refinement—from rough sketch to detailed model. Viewed from a low angle along the table's length. Warm studio light, cream and terracotta tones, the most refined model glowing at the far end.`},
+
+  { id:23, cat:"Design", type:"Web Design", name:"Information Architecture",
+    def:"The organization of website content, navigation, page relationships, and user pathways.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure arranges floating blocks into a clear hierarchical structure in midair, each block connected by lines of light. Viewed from a slight elevation looking down and across. The structure takes on a tree-like form. Deep space blue background, blocks in warm cream and amber, connecting lines in cool blue light.`},
+
+  { id:24, cat:"Design", type:"Brand Identity", name:"Visual Identity Development",
+    def:"The creation or evolution of the visual system that represents the organization.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure holds a glass prism up to a beam of light, the refracted colors spreading outward into a coherent and beautiful pattern on the surface beyond. Viewed from behind the figure, the prism at arm's length. The refracted pattern fills the wide frame. Dramatic single beam of white light, brilliant spectrum of colors spreading outward, cool dark surroundings.`},
+
+  { id:25, cat:"Design", type:"Brand Identity", name:"Logo Design",
+    def:"The creation or refinement of a primary visual mark for an organization, product, or initiative.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure makes a single precise mark with a large brush on a vast blank canvas, the mark bold, confident, and perfectly placed. Viewed from low behind the figure, the canvas stretching upward. The studio is spare and light-filled. White canvas, deep black ink, warm golden light flooding from a skylight above.`},
+
+  { id:26, cat:"Design", type:"Brand Identity", name:"Brand Guidelines",
+    def:"The documentation of brand standards, usage rules, visual systems, and communication guidelines.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure carefully binds together a large illustrated reference book, surrounded by organized swatches, specimens, and samples arranged on shelves. Viewed from a slight high angle. The room is a well-ordered library of standards. Deep navy and cream tones, warm amber wood, each sample a different vivid color arranged systematically.`},
+
+  { id:27, cat:"Design", type:"Brand Identity", name:"Brand Architecture",
+    def:"The organization of brands, sub-brands, products, services, and naming relationships within a broader identity system.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure stands at the root of a large, beautifully organized tree structure, its branches clearly labeled and proportioned. Viewed from behind looking up into the canopy. Each branch is a different color and weight. Deep greens and blues, the main trunk strong and dark, branches thinning and diversifying upward into bright colors.`},
+
+  { id:28, cat:"Design", type:"Design Systems", name:"Design System Development",
+    def:"The creation of reusable design patterns, components, standards, and documentation.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure assembles modular components into a large unified structure. Viewed from the side, the structure growing outward and upward. The components click together precisely. Cool grays and blues, with each component type carrying a distinct accent color, the completed sections glowing with cohesion.`},
+
+  { id:29, cat:"Design", type:"Marketing Design", name:"Campaign Design",
+    def:"The design of creative assets for campaigns, promotions, launches, and marketing initiatives.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure paints a large mural, the imagery coming to life as they work—characters and shapes emerging from the surface and animating. Viewed from far below looking up at the mural's full scale. The scene is dynamic and electric. Bold saturated colors, the mural filling the entire background wall.`},
+
+  { id:30, cat:"Design", type:"Marketing Design", name:"Advertising Creative",
+    def:"The creation of visual assets for paid campaigns and promotional channels.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure releases a vivid, striking visual composition from their hands—it unfolds and expands as it rises, capturing the gaze of figures below in a plaza. Viewed from an elevated angle behind the creator. Deep orange and warm red as the creative expands, the plaza below in cool blues and grays.`},
+
+  { id:31, cat:"Design", type:"Marketing Design", name:"Social Media Design",
+    def:"The creation of designed assets for social platforms and audience engagement.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure frames a scene through their hands in a rectangular viewfinder gesture, composing the perfect image from a landscape in front of them. Viewed from behind and slightly to the side. The scene inside the frame is vivid and perfect, the surroundings softer. Blues and greens outside, vibrant warm scene within the frame.`},
+
+  { id:32, cat:"Design", type:"Marketing Design", name:"Sales Collateral Design",
+    def:"The design of materials that support business development, sales conversations, and stakeholder communication.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure presents a beautifully organized spread of materials on a large table—each piece perfectly designed and purposeful. Viewed from across the table at a slight high angle. Warm cream and deep navy tones, the table a rich wood, each piece of collateral sharp and precise in the illustration.`},
+
+  { id:33, cat:"Design", type:"Product Design", name:"Product UX Design",
+    def:"The design of user flows, structures, and interactions for digital products or applications.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure walks along a path that becomes clearer and more direct with each step—obstacles dissolve, the route smooths, waypoints light up. Viewed from the side in a wide panoramic frame. Warm greens and blues, the cleared path glowing gently, obstacles in muted grays.`},
+
+  { id:34, cat:"Design", type:"Product Design", name:"Product UI Design",
+    def:"The visual and interface design of digital products, applications, and software experiences.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure polishes a large luminous surface, each pass of their cloth revealing intricate, precise details beneath—refined textures, crisp edges, subtle gradients. Viewed from a low angle beside the surface. Warm golds and cool blues, high contrast between the polished and unpolished areas.`},
+
+  { id:35, cat:"Design", type:"Product Design", name:"User Research",
+    def:"The discovery and analysis of user needs, behaviors, pain points, and expectations.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure sits very still with eyes closed at the center of a space, surrounded by voices and thoughts rising as visual shapes from all directions. Viewed from above looking down. The figure listens deeply. The surrounding shapes in various warm colors spiral inward toward the figure. Deep, quiet, contemplative scene.`},
+
+  { id:36, cat:"Design", type:"Design Systems", name:"Design Governance",
+    def:"The creation of standards, processes, and oversight mechanisms that ensure design consistency across teams and products.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure tends carefully to a formal garden of design elements—pruning some, nurturing others, maintaining the structured rows and proportions. Viewed from an elevated wide angle. The garden is large, organized, and meticulously kept. Deep greens and clipped topiary shapes, gravel paths in warm stone.`},
+
+  { id:37, cat:"Design", type:"Design Systems", name:"Enterprise Design Systems",
+    def:"The creation of large-scale design systems that support multiple products, websites, teams, and brands within complex organizations.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A single figure stands atop a vast organized grid of design components extending to the horizon in every direction, each section color-coded. Viewed from a worm's eye angle looking up. Deep blues and grays, accent colors marking each component category, the horizon glowing warm.`},
+
+  { id:38, cat:"Development", type:"Front-End", name:"Responsive Development",
+    def:"The implementation of digital experiences that function effectively across desktop, tablet, and mobile devices.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure stretches a flexible membrane across different-sized frames—small, medium, large—the content within each frame adapting perfectly to fit. Viewed from the side in a wide frame. Warm teal and amber, the membranes translucent, content visible adapting within each frame, the motion fluid and organic.`},
+
+  { id:39, cat:"Development", type:"Front-End", name:"Accessibility Implementation",
+    def:"The implementation of accessibility standards and best practices within digital experiences.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure constructs a wide, well-lit path with gentle ramps, clear markings, and generous proportions—designed so anyone can navigate it with ease. Viewed from a low angle looking along the path's length. Warm stone and cream, the path broad and level, bright clear sky above.`},
+
+  { id:40, cat:"Development", type:"Front-End", name:"Performance Optimization",
+    def:"The optimization of front-end code, assets, and delivery mechanisms to improve speed and user experience.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure fine-tunes a complex precision instrument—turning small adjustments that send ripples of efficiency outward. Sparks of released energy fly off as friction is removed. Viewed from a low angle beside the instrument. Deep metallic blues and silvers, warm amber sparks, motion implied by motion lines.`},
+
+  { id:41, cat:"Development", type:"Back-End", name:"Custom Application Development",
+    def:"The creation of custom functionality, applications, and systems that support specific organizational requirements.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure engineers a complex custom machine from raw components in a vast workshop, assembling something that has never existed before. Viewed from a slight high angle looking across the workshop floor. Warm workshop light, deep wood and metal tones, the emerging machine in bold geometric forms.`},
+
+  { id:42, cat:"Development", type:"Back-End", name:"CMS Development",
+    def:"The implementation and customization of content management systems to support organizational content operations.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure organizes a large, beautiful library—each section clearly labeled, items easy to find and rearrange. The shelves are modular and flexible. Viewed from the end of a long aisle looking toward the figure. Deep navy shelves, warm amber lamp light, books and content in varied vivid colors.`},
+
+  { id:43, cat:"Development", type:"Back-End", name:"Custom Platform Extensions",
+    def:"The development of custom functionality that extends the capabilities of an existing platform.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure attaches new modules to a large existing structure—extending it outward and upward with purposeful additions. Viewed from a low angle beside the structure. Deep blues and grays for the existing structure, warm amber for the new extensions glowing where they attach, a wide industrial sky above.`},
+
+  { id:44, cat:"Development", type:"Maintenance", name:"Website Maintenance",
+    def:"The ongoing support and upkeep of websites and digital platforms to ensure continued operation and performance.",
+    outcomes:["Continuity","Growth"],
+    prompt:`A figure tends to a thriving digital landscape—pruning, watering, and carefully maintaining each element. Viewed from an elevated wide angle. The landscape is a mix of organic garden and architectural precision. Deep greens and blues, warm sunlight, the figure small and purposeful.`},
+
+  { id:45, cat:"Development", type:"Maintenance", name:"Security & Platform Updates",
+    def:"The application of security improvements, patches, and platform upgrades that reduce risk and maintain long-term stability.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure reinforces the layered walls of a structure from within, adding protective plates and sealing gaps with precision. Viewed from inside looking outward, the figure silhouetted against the wall they're reinforcing. Deep stone grays and blues, the reinforced areas gleaming, warm interior light behind the figure.`},
+
+  { id:46, cat:"Development", type:"Maintenance", name:"Monitoring & Support",
+    def:"The proactive monitoring, troubleshooting, and resolution of issues across digital platforms and systems.",
+    outcomes:["Continuity","Growth"],
+    prompt:`A figure stands watch from a tall watchtower overlooking a vast digital landscape below, attentive and vigilant. Night scene, the landscape lit with scattered warm lights below. Viewed from a low angle at the base of the tower looking up. Deep midnight blues and black, warm amber from the watchtower window.`},
+
+  { id:47, cat:"Development", type:"APIs", name:"API Development",
+    def:"The creation of application programming interfaces that allow systems to exchange data and functionality.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure constructs a series of elegant bridges between floating platforms separated by open space, each bridge precisely engineered and functional. Viewed from the side, the platforms at different heights. Cool blues and grays, the platforms solid and geometric, the bridges in warm amber metal arching between them.`},
+
+  { id:48, cat:"Development", type:"APIs", name:"API Integrations",
+    def:"The implementation of connections between internal and external systems through APIs.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure connects two complex pipe systems with a precise coupling, data flowing immediately between them as the connection completes. Viewed from a low angle beside the connection point. Deep blues on one side, warm terracotta on the other, the connection point glowing where they join, motion lines showing the flow.`},
+
+  { id:49, cat:"Development", type:"APIs", name:"Middleware Development",
+    def:"The creation of intermediary systems that facilitate communication and workflows between platforms.",
+    outcomes:["Actualization","Continuity"],
+    prompt:`A figure stands between two very different worlds—one mechanical and angular, one organic and flowing—translating and passing information between them with fluid gestures. Viewed from the side, the figure perfectly centered. Left side deep metallic blues and grays, right side warm organic greens and ambers.`},
+
+  { id:50, cat:"Development", type:"Systems Integration", name:"CRM Integration",
+    def:"The connection of websites, applications, and digital platforms to customer relationship management systems.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure weaves together threads of relationship data into a coherent and organized tapestry. Viewed from above looking down at the weaving. Warm golds and oranges for the relationship threads, deep indigo for the background structure, the weave intricate and purposeful.`},
+
+  { id:51, cat:"Development", type:"Systems Integration", name:"ERP Integration",
+    def:"The integration of enterprise resource planning systems with digital platforms and operational processes.",
+    outcomes:["Continuity","Actualization"],
+    prompt:`A figure aligns the large gears of a complex operational machine, each gear a different system clicking into synchronized motion. Viewed from the side, the gears filling the frame. Deep metallic grays and blues, warm amber oil at the contact points, the machine filling the wide frame with industrial scale.`},
+
+  { id:52, cat:"Development", type:"Systems Integration", name:"Marketing Automation Integration",
+    def:"The integration of marketing platforms, workflows, and automation systems with digital experiences.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure conducts multiple channels like an orchestra—each playing in its own rhythm but synchronized into a unified whole under their direction. Viewed from behind the conductor, the channels spread out before them. Deep stage blues and blacks, each channel a different warm color, spotlights picking out the synchronized moments.`},
+
+  { id:53, cat:"Development", type:"Systems Integration", name:"Ecommerce Integration",
+    def:"The connection of ecommerce platforms with operational, marketing, fulfillment, and customer management systems.",
+    outcomes:["Growth","Continuity"],
+    prompt:`A figure orchestrates a flowing system of commerce—products, payments, fulfillment—each element moving through its proper channel in a connected ecosystem. Viewed from an elevated angle looking down at the flow. Warm greens and blues, the flow of commerce in amber and gold, the system spreading across the wide panoramic frame.`},
+
+  { id:54, cat:"Strategy", type:"UX Audit", name:"User Journey Optimization",
+    def:"The evaluation and improvement of user pathways, interactions, and conversion experiences to reduce friction and improve outcomes.",
+    outcomes:["Growth","Actualization"],
+    prompt:`A figure clears boulders from a winding, complicated path—each removed obstacle making the route straighter, clearer, more direct. Viewed from the side in a wide panoramic frame. Rocky terrain in muted grays and browns, the cleared path in warm green, sky transitioning from overcast to clear blue.`},
+
+  { id:55, cat:"Strategy", type:"Brand Positioning", name:"Brand Positioning Strategy",
+    def:"The development of a differentiated market position that clarifies why an organization exists, who it serves, and why it matters.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure plants a flag confidently on a distinct hilltop, having chosen this specific position deliberately above the surrounding terrain. Viewed from below and behind, looking up at the figure against the sky. Bold sky blues and warm earth tones, the flag in vivid color, the figure's posture confident and certain.`},
+
+  { id:56, cat:"Strategy", type:"Brand Positioning", name:"Messaging Architecture",
+    def:"The development of structured messaging frameworks that communicate value consistently across channels and audiences.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure constructs a layered communication tower—each level transmitting a clear, structured message outward in expanding rings. Viewed from a low angle at the base looking up. The tower is elegant and purposeful. Deep blues and grays for the structure, warm amber for the transmitting rings expanding outward filling the wide frame.`},
+
+  { id:57, cat:"Strategy", type:"Product / Service Definition", name:"Product Strategy",
+    def:"The evaluation, definition, and structuring of products to improve market fit, positioning, and organizational alignment.",
+    outcomes:["Actualization","Growth"],
+    prompt:`A figure shapes raw formless material into a precisely defined, purposeful object on a large workbench. The process of definition is mid-way—part raw, part refined. Warm workshop light, clay tones for the raw material, the refined emerging form in crisp clean shapes, deep shadow behind.`},
+];
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let currentId = 1;
+let filtered  = [...SERVICES];
+let autoGenTimer = null;
+
+// ─── STORAGE HELPERS ────────────────────────────────────────────────────────
+const imgKey  = id => `tf_img_${id}`;
+const getImg  = id => { try { return localStorage.getItem(imgKey(id)); } catch(e){ return null; } };
+const saveImg = (id, v) => { try { localStorage.setItem(imgKey(id), v); } catch(e){ console.warn('Storage full'); } };
+const delImg  = id => { try { localStorage.removeItem(imgKey(id)); } catch(e){}; };
+
+function getApiKey()      { try { return localStorage.getItem('tf_apikey') || ''; } catch(e){ return ''; } }
+function getProvider()    { try { return localStorage.getItem('tf_provider') || 'fal'; } catch(e){ return 'fal'; } }
+function saveProvider(v)  { try { localStorage.setItem('tf_provider', v); } catch(e){}; }
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore API key + provider
+  const k = getApiKey();
+  document.getElementById('apiKeyInput').value = k ? '••••••••••••' : '';
+  document.getElementById('apiProvider').value = getProvider();
+  updateKeyStatus(k);
+
+  renderSidebar(SERVICES);
+  selectService(1);
+  updateProgress();
+});
+
+// ─── API KEY ─────────────────────────────────────────────────────────────────
+let rawKey = getApiKey();
+
+function onKeyInput() {
+  const v = document.getElementById('apiKeyInput').value.trim();
+  if (!v || v === '••••••••••••') return;
+  rawKey = v;
+  try { localStorage.setItem('tf_apikey', v); } catch(e){}
+  updateKeyStatus(v);
+}
+
+function updateKeyStatus(k) {
+  const el = document.getElementById('keyStatus');
+  if (k) {
+    el.textContent = 'Key saved ✓';
+    el.className = 'key-status ok';
+  } else {
+    el.textContent = 'No key set';
+    el.className = 'key-status';
+  }
+}
+
+function toggleKeyVis() {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function onProviderChange() {
+  const v = document.getElementById('apiProvider').value;
+  saveProvider(v);
+  updatePreview();
+}
+
+// ─── STYLE POPOVER ───────────────────────────────────────────────────────────
+function toggleStylePopover() {
+  const pop = document.getElementById('stylePopover');
+  pop.classList.toggle('open');
+  if (pop.classList.contains('open')) renderStyleRefs();
+}
+
+// ─── STYLE REFERENCE IMAGES ──────────────────────────────────────────────────
+function loadStyleRefs() {
+  try { return JSON.parse(localStorage.getItem('tf_style_refs') || '[]'); }
+  catch { return []; }
+}
+function saveStyleRefs(arr) { localStorage.setItem('tf_style_refs', JSON.stringify(arr)); }
+
+function renderStyleRefs() {
+  const thumbs = document.getElementById('styleRefThumbs');
+  const placeholder = document.getElementById('styleRefPlaceholder');
+  if (!thumbs) return;
+  const refs = loadStyleRefs();
+  thumbs.innerHTML = refs.map((src, i) => `
+    <div class="style-ref-thumb">
+      <img src="${src}" alt="Ref ${i+1}">
+      <button class="style-ref-del" onclick="removeStyleRefImage(${i})" title="Remove">✕</button>
+    </div>`).join('');
+  if (placeholder) placeholder.style.display = refs.length ? 'none' : '';
+}
+
+function addStyleRefImages(files) {
+  const refs = loadStyleRefs();
+  const imgs = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!imgs.length) return;
+  let pending = imgs.length;
+  imgs.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      refs.push(e.target.result);
+      pending--;
+      if (pending === 0) { saveStyleRefs(refs); renderStyleRefs(); }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeStyleRefImage(idx) {
+  const refs = loadStyleRefs();
+  refs.splice(idx, 1);
+  saveStyleRefs(refs);
+  renderStyleRefs();
+}
+
+function styleRefZoneClick(e) {
+  if (e.target.closest('.style-ref-del')) return; // let X buttons handle themselves
+  document.getElementById('styleRefInput')?.click();
+}
+
+function styleRefDragOver(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('styleRefZone')?.classList.add('drag-over');
+}
+
+function styleRefDragLeave(e) {
+  // Only remove if leaving the zone itself (not a child)
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    document.getElementById('styleRefZone')?.classList.remove('drag-over');
+  }
+}
+
+function styleRefDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+  document.getElementById('styleRefZone')?.classList.remove('drag-over');
+  addStyleRefImages(e.dataTransfer.files);
+}
+// Close popover when clicking outside
+document.addEventListener('click', e => {
+  const pop = document.getElementById('stylePopover');
+  if (!pop?.classList.contains('open')) return;
+  if (!pop.contains(e.target) && !e.target.closest('[onclick*="toggleStylePopover"]')) {
+    pop.classList.remove('open');
+  }
+});
+
+// ─── GALLERY ─────────────────────────────────────────────────────────────────
+function openGallery() {
+  renderGallery();
+  document.getElementById('galleryModal').classList.add('open');
+}
+
+function closeGallery() {
+  document.getElementById('galleryModal').classList.remove('open');
+}
+
+function renderGallery() {
+  const grid = document.getElementById('galleryGrid');
+  if (!grid) return;
+  grid.innerHTML = SERVICES.map(s => {
+    const img = getImg(s.id);
+    const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const catClass = s.cat.toLowerCase();
+    return `
+      <div class="gal-card" onclick="${img ? `openLightbox(${s.id})` : ''}">
+        <div class="gal-img">
+          ${img
+            ? `<img src="${img}" alt="${s.name}">`
+            : `<div class="gal-empty">No image yet</div>`}
+        </div>
+        <div class="gal-info">
+          <span class="gal-name" title="${s.name}">
+            <span class="cat-tag ${catClass}" style="font-size:9px;padding:1px 5px;margin-right:5px">${s.cat}</span>${s.name}
+          </span>
+          <button class="gal-dl" ${!img ? 'disabled' : ''} onclick="event.stopPropagation();galDownload('${fname}',${s.id})">↓</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function galDownload(fname, id) {
+  const img = getImg(id);
+  if (!img) return;
+  const a = document.createElement('a');
+  a.href = img; a.download = fname + '.png'; a.click();
+}
+
+// ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
+let lbCurrentId = null;
+// IDs of services that have generated images (for lightbox prev/next)
+function lbGeneratedIds() { return SERVICES.filter(s => getImg(s.id)).map(s => s.id); }
+
+function openLightbox(id) {
+  lbCurrentId = id;
+  renderLightbox();
+  document.getElementById('lightbox').classList.add('open');
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  lbCurrentId = null;
+}
+
+function renderLightbox() {
+  if (!lbCurrentId) return;
+  const s = SERVICES.find(x => x.id === lbCurrentId);
+  const img = getImg(lbCurrentId);
+  const ids = lbGeneratedIds();
+  const idx = ids.indexOf(lbCurrentId);
+
+  document.getElementById('lbImg').src  = img || '';
+  document.getElementById('lbImg').alt  = s?.name || '';
+  document.getElementById('lbName').textContent = s?.name || '';
+  document.getElementById('lbOf').textContent   = `${idx+1} / ${ids.length}`;
+  document.getElementById('lbPrevBtn').disabled = idx <= 0;
+  document.getElementById('lbNextBtn').disabled = idx >= ids.length - 1;
+}
+
+function lbNav(dir) {
+  const ids = lbGeneratedIds();
+  const idx = ids.indexOf(lbCurrentId);
+  const next = idx + dir;
+  if (next < 0 || next >= ids.length) return;
+  lbCurrentId = ids[next];
+  renderLightbox();
+}
+
+function lbDownload() {
+  if (!lbCurrentId) return;
+  const s = SERVICES.find(x => x.id === lbCurrentId);
+  const img = getImg(lbCurrentId);
+  if (!img || !s) return;
+  const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+  const a = document.createElement('a');
+  a.href = img; a.download = fname + '.png'; a.click();
+}
+
+// Keyboard nav for lightbox
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox')?.classList.contains('open')) return;
+  if (e.key === 'ArrowLeft')  lbNav(-1);
+  if (e.key === 'ArrowRight') lbNav(1);
+  if (e.key === 'Escape')     closeLightbox();
+});
+
+function bulkDownload() {
+  const generated = SERVICES.filter(s => getImg(s.id));
+  if (!generated.length) { alert('No images generated yet.'); return; }
+  generated.forEach((s, i) => {
+    const img = getImg(s.id);
+    const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    setTimeout(() => {
+      const a = document.createElement('a');
+      a.href = img; a.download = fname + '.png'; a.click();
+    }, i * 200); // stagger to avoid browser blocking
+  });
+}
+
+// ─── SIDEBAR ─────────────────────────────────────────────────────────────────
+const collapsedCats = new Set(
+  JSON.parse(localStorage.getItem('tf_collapsed') || '[]')
+);
+function saveCatCollapse() {
+  try { localStorage.setItem('tf_collapsed', JSON.stringify([...collapsedCats])); } catch(e){}
+}
+function toggleCat(cat, blockEl) {
+  if (collapsedCats.has(cat)) {
+    collapsedCats.delete(cat);
+    blockEl.classList.remove('collapsed');
+  } else {
+    collapsedCats.add(cat);
+    blockEl.classList.add('collapsed');
+  }
+  saveCatCollapse();
+}
+
+function renderSidebar(services) {
+  const cats = ['Marketing','Design','Development','Strategy'];
+  const nav  = document.getElementById('serviceNav');
+  nav.innerHTML = '';
+
+  cats.forEach(cat => {
+    const items = services.filter(s => s.cat === cat);
+    if (!items.length) return;
+    const isCollapsed = collapsedCats.has(cat);
+
+    const block = document.createElement('div');
+    block.className = 'cat-block' + (isCollapsed ? ' collapsed' : '');
+    block.innerHTML = `
+      <div class="cat-hdr" onclick="toggleCat('${cat}', this.parentElement)">
+        <span class="cat-hdr-label">${cat}</span>
+        <span class="cat-n">${items.length}</span>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="cat-items">
+        ${items.map(s => `
+          <div class="svc-item ${s.id === currentId ? 'active' : ''}" id="nav-${s.id}" onclick="selectService(${s.id})">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${s.name}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    nav.appendChild(block);
+  });
+
+  const total = services.length;
+  document.getElementById('progressPill').textContent =
+    `${countGenerated()} / ${SERVICES.length} generated`;
+}
+
+function countGenerated() {
+  return SERVICES.filter(s => getImg(s.id)).length;
+}
+
+function updateProgress() {
+  document.getElementById('progressPill').textContent =
+    `${countGenerated()} / ${SERVICES.length} generated`;
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────────
+function filterServices(q) {
+  const t = q.toLowerCase();
+  filtered = SERVICES.filter(s =>
+    s.name.toLowerCase().includes(t) ||
+    s.cat.toLowerCase().includes(t)  ||
+    s.type.toLowerCase().includes(t)
+  );
+  renderSidebar(filtered);
+  if (!filtered.find(s => s.id === currentId) && filtered.length)
+    selectService(filtered[0].id);
+}
+
+function selectService(id) {
+  currentId = id;
+  clearTimeout(autoGenTimer);
+
+  document.querySelectorAll('.svc-item').forEach(el => el.classList.remove('active'));
+  const nav = document.getElementById(`nav-${id}`);
+  if (nav) { nav.classList.add('active'); nav.scrollIntoView({ block:'nearest' }); }
+
+  renderCard();
+
+  // Auto-generate if no image and API key present
+  if (!getImg(id) && getApiKey()) {
+    const cap = id;
+    autoGenTimer = setTimeout(() => {
+      if (currentId === cap) generateImage();
+    }, 700);
+  }
+}
+
+// ─── ICONS ───────────────────────────────────────────────────────────────────
+const ICON_COPY  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+// ─── CARD RENDER ─────────────────────────────────────────────────────────────
+function renderNav() {
+  const s = SERVICES.find(x => x.id === currentId);
+  if (!s) return;
+  const all  = SERVICES.map(x => x.id);
+  const pos  = all.indexOf(s.id);
+  const prev = pos > 0 ? all[pos-1] : null;
+  const next = pos < all.length-1 ? all[pos+1] : null;
+  const pageNav = document.getElementById('pageNav');
+  if (!pageNav) return;
+  pageNav.innerHTML = `
+    <button class="nav-b" onclick="${prev ? `selectService(${prev})` : ''}" ${!prev?'disabled':''}>
+      ← ${prev ? SERVICES.find(x=>x.id===prev).name : ''}
+    </button>
+    <button class="nav-b" onclick="${next ? `selectService(${next})` : ''}" ${!next?'disabled':''}>
+      ${next ? SERVICES.find(x=>x.id===next).name : ''} →
+    </button>`;
+}
+
+function renderCard() {
+  const s = SERVICES.find(x => x.id === currentId);
+  if (!s) return;
+
+  const all  = SERVICES.map(x => x.id);
+  const pos  = all.indexOf(s.id);
+  const cc   = s.cat.toLowerCase();
+  const prov = getProvider() === 'fal' ? 'fal.ai · FLUX Pro 1.1' : 'OpenAI · DALL·E 3';
+
+  document.getElementById('serviceCard').innerHTML = `
+
+    <!-- Header — outside the card surface -->
+    <div class="card-head">
+      <div class="card-meta">
+        <span class="cat-tag ${cc}">${s.cat}</span>
+        <span class="svc-type">${s.type}</span>
+        <span class="card-pos">${pos+1} / ${SERVICES.length}</span>
+      </div>
+      <div class="card-name">${s.name}</div>
+      <div class="card-def">${s.def}</div>
+      <div class="card-chips">
+        ${s.outcomes.map(o => `<span class="chip">${o}</span>`).join('')}
+      </div>
+    </div>
+
+    <!-- Card surface — image + controls only -->
+    <div class="svc-card">
+      <div class="card-body">
+
+        <!-- LEFT: image column -->
+        <div class="card-img-col">
+          <div class="sec-hdr">
+            <span class="sec-label">Image</span>
+            <div class="sec-actions">
+              <span class="provider-tag" id="providerTag">${prov}</span>
+              <button class="btn" id="regenBtn" onclick="generateImage()">Regenerate</button>
+            </div>
+          </div>
+          <div class="img-area">
+            <div class="img-body" id="imgBody"></div>
+          </div>
+          <div class="upload-link">
+            or <label>upload your own<input type="file" accept="image/*" onchange="handleUpload(this)"></label>
+          </div>
+        </div>
+
+        <!-- RIGHT: controls column -->
+        <div class="card-ctrl-col">
+          <div class="prompt-sec">
+            <div class="prompt-hdr">
+              <span class="sec-label">Prompt</span>
+              <div class="sec-actions">
+                <button class="btn btn-icon" id="copyBaseBtn" onclick="copyBasePrompt()" title="Copy prompt">${ICON_COPY}</button>
+              </div>
+            </div>
+            <textarea class="prompt-ta" id="promptEdit" oninput="updatePreview()">${s.prompt}</textarea>
+
+            <div class="preview-lbl-row">
+              <span class="preview-lbl">Full prompt</span>
+              <div class="sec-actions">
+                <button class="btn btn-icon" id="copyBtn" onclick="copyPrompt()" title="Copy full prompt">${ICON_COPY}</button>
+              </div>
+            </div>
+            <textarea class="preview-box" id="promptPreview" spellcheck="false" placeholder="Assembled prompt will appear here…"></textarea>
+          </div>
+
+          <div class="card-style-override">
+            <button class="cso-toggle" onclick="toggleCso(this)">+ Style override for this page</button>
+            <div class="cso-body" id="csoBody-${s.id}">
+              <div class="cso-lbl">Overrides the global style for this service only</div>
+              <textarea
+                placeholder="e.g. Dark cinematic lighting, photorealistic, no flat illustration…"
+                oninput="updatePreview()"
+                id="csoTA-${s.id}"
+              >${getCso(s.id)}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  renderNav();
+  updatePreview();
+  renderImgBody();
+}
+
+// ─── IMAGE AREA ───────────────────────────────────────────────────────────────
+function renderImgBody() {
+  const body = document.getElementById('imgBody');
+  if (!body) return;
+  const existing = getImg(currentId);
+  const key = getApiKey();
+
+  if (existing) {
+    showResult(existing);
+  } else if (!key) {
+    body.innerHTML = `
+      <div class="img-noapikey">
+        <strong>Add your API key above</strong> to auto-generate images.<br>
+        <span style="font-size:11px">Get a key at <a href="https://fal.ai" target="_blank" style="color:var(--text2)">fal.ai</a> or <a href="https://platform.openai.com" target="_blank" style="color:var(--text2)">platform.openai.com</a></span>
+      </div>`;
+  } else {
+    body.innerHTML = `<div class="img-empty">Generating image…</div>`;
+  }
+}
+
+function showResult(src) {
+  const body = document.getElementById('imgBody');
+  if (!body) return;
+  const s = SERVICES.find(x => x.id === currentId);
+  const fname = s ? s.name.replace(/[^a-z0-9]/gi,'-').toLowerCase() : `service-${currentId}`;
+  body.innerHTML = `
+    <div class="img-result">
+      <img src="${src}" alt="${s?.name || ''}">
+      <div class="img-btns">
+        <button class="ib dl"    onclick="downloadImg('${fname}')">↓ Download</button>
+        <button class="ib del"   onclick="clearImg()">✕</button>
+      </div>
+    </div>`;
+  updateProgress();
+}
+
+// ─── PER-CARD STYLE OVERRIDE ─────────────────────────────────────────────────
+const csoKey  = id => `tf_cso_${id}`;
+const getCso  = id => { try { return localStorage.getItem(csoKey(id)) || ''; } catch(e){ return ''; } };
+const saveCso = (id, v) => { try { if (v) localStorage.setItem(csoKey(id), v); else localStorage.removeItem(csoKey(id)); } catch(e){}; };
+
+function toggleCso(btn) {
+  const body = btn.nextElementSibling;
+  const open = body.classList.toggle('open');
+  btn.textContent = open ? '− Style override for this page' : '+ Style override for this page';
+  if (open) body.querySelector('textarea')?.focus();
+}
+
+// ─── GENERATE ────────────────────────────────────────────────────────────────
+function buildPrompt() {
+  const fullTA = document.getElementById('promptPreview');
+  if (fullTA?.value.trim()) return fullTA.value.trim();
+  const core  = (document.getElementById('promptEdit')?.value || '').trim();
+  const cso   = (document.getElementById(`csoTA-${currentId}`)?.value || '').trim();
+  const style = cso || (document.getElementById('styleDesc')?.value || '').trim();
+  saveCso(currentId, cso);
+  return [core, style].filter(Boolean).join('. ');
+}
+
+async function generateImage() {
+  const capId = currentId;
+  const key   = getApiKey();
+  if (!key) { renderImgBody(); return; }
+
+  const body = document.getElementById('imgBody');
+  if (body) body.innerHTML = `
+    <div class="img-gen-state">
+      <div class="big-spin"></div>
+      <div class="gen-txt">Generating…</div>
+      <div class="gen-sub">Usually 10–30 seconds</div>
+    </div>`;
+
+  const regenBtn = document.getElementById('regenBtn');
+  if (regenBtn) regenBtn.disabled = true;
+
+  const prompt   = buildPrompt();
+  const provider = getProvider();
+
+  try {
+    let imgUrl;
+    if (provider === 'fal') {
+      imgUrl = await genFal(prompt, key);
+    } else {
+      imgUrl = await genDalle(prompt, key);
+    }
+
+    if (currentId !== capId) return; // navigated away
+
+    // Fetch as blob → data URL for persistent storage + download
+    let dataUrl = imgUrl;
+    try {
+      const resp = await fetch(imgUrl);
+      const blob = await resp.blob();
+      dataUrl = await blobToDataUrl(blob);
+    } catch(e) { /* fallback to direct URL */ }
+
+    saveImg(capId, dataUrl);
+    if (currentId === capId) showResult(dataUrl);
+
+  } catch(err) {
+    if (currentId !== capId) return;
+    const b2 = document.getElementById('imgBody');
+    if (b2) b2.innerHTML = `
+      <div class="img-error">
+        <strong>Generation failed:</strong> ${err.message || 'Unknown error.'}<br>
+        Check your API key and try again.
+      </div>`;
+  } finally {
+    if (currentId === capId) {
+      const rb = document.getElementById('regenBtn');
+      if (rb) rb.disabled = false;
+    }
+  }
+}
+
+async function genFal(prompt, key) {
+  const model     = 'fal-ai/flux-pro/v1.1';
+  const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
+  const res = await fetch(`https://fal.run/${model}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Key ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      prompt,
+      image_size: imageSize,
+      num_images: 1,
+      output_format: 'jpeg',
+      safety_tolerance: '2'
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.detail || err.message || `fal.ai error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.images?.[0]?.url || (() => { throw new Error('No image in response'); })();
+}
+
+async function genDalle(prompt, key) {
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'dall-e-3',
+      prompt,
+      n: 1,
+      size: '1792x1024',
+      quality: 'hd'
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error?.message || `OpenAI error ${res.status}`);
+  }
+  const data = await res.json();
+  return data.data?.[0]?.url || (() => { throw new Error('No image in response'); })();
+}
+
+function blobToDataUrl(blob) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsDataURL(blob);
+  });
+}
+
+// ─── IMAGE ACTIONS ────────────────────────────────────────────────────────────
+function downloadImg(fname) {
+  const img = document.querySelector('#imgBody img');
+  if (!img) return;
+  const a = document.createElement('a');
+  a.href = img.src; a.download = fname + '.png'; a.click();
+}
+
+function clearImg() {
+  delImg(currentId);
+  updateProgress();
+  renderImgBody();
+}
+
+function handleUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    saveImg(currentId, e.target.result);
+    showResult(e.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ─── PROMPT ──────────────────────────────────────────────────────────────────
+function updatePreview() {
+  const prev = document.getElementById('promptPreview');
+  if (!prev) return;
+  const core  = (document.getElementById('promptEdit')?.value || '').trim();
+  const cso   = (document.getElementById(`csoTA-${currentId}`)?.value || '').trim();
+  const style = cso || (document.getElementById('styleDesc')?.value || '').trim();
+  prev.value = [core, style].filter(Boolean).join('. ');
+}
+
+function resetPrompt(id) {
+  const s = SERVICES.find(x => x.id === id);
+  if (!s) return;
+  const ta = document.getElementById('promptEdit');
+  if (ta) { ta.value = s.prompt; updatePreview(); }
+}
+
+function copyPrompt() {
+  const prev = document.getElementById('promptPreview');
+  if (!prev) return;
+  navigator.clipboard.writeText(prev.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    if (!btn) return;
+    btn.innerHTML = ICON_CHECK;
+    btn.classList.add('green');
+    setTimeout(() => { btn.innerHTML = ICON_COPY; btn.classList.remove('green'); }, 1800);
+  });
+}
+
+function copyBasePrompt() {
+  const ta = document.getElementById('promptEdit');
+  if (!ta) return;
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = document.getElementById('copyBaseBtn');
+    if (!btn) return;
+    btn.innerHTML = ICON_CHECK;
+    btn.classList.add('green');
+    setTimeout(() => { btn.innerHTML = ICON_COPY; btn.classList.remove('green'); }, 1800);
+  });
+}
+</script>
+</body>
+</html>
