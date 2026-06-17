@@ -1404,12 +1404,14 @@ async function generateImage() {
 
   const prompt    = buildPrompt();
   const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
+  const styleRefs = loadStyleRefs();
+  const styleImage = styleRefs.length ? styleRefs[0] : null;
 
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_size: imageSize })
+      body: JSON.stringify({ prompt, image_size: imageSize, style_image: styleImage })
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
