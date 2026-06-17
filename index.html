@@ -1388,8 +1388,6 @@ function toggleCso(btn) {
 
 // ─── GENERATE ────────────────────────────────────────────────────────────────
 function buildPrompt() {
-  const fullTA = document.getElementById('promptPreview');
-  if (fullTA?.value.trim()) return fullTA.value.trim();
   const core  = (document.getElementById('promptEdit')?.value || '').trim();
   const cso   = (document.getElementById(`csoTA-${currentId}`)?.value || '').trim();
   const style = cso || (document.getElementById('styleDesc')?.value || '').trim();
@@ -1486,7 +1484,7 @@ function updatePreview() {
   const core  = (document.getElementById('promptEdit')?.value || '').trim();
   const cso   = (document.getElementById(`csoTA-${currentId}`)?.value || '').trim();
   const style = cso || (document.getElementById('styleDesc')?.value || '').trim();
-  prev.value = [core, style].filter(Boolean).join('. ');
+  prev.value = [style, core].filter(Boolean).join('. ');
 }
 
 function resetPrompt(id) {
