@@ -46,7 +46,6 @@ header {
   z-index: 20;
   position: relative;
 }
-.brand { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; }
 .hdr-sep { color: var(--border); font-size: 15px; }
 .hdr-sub { font-size: 12px; color: var(--text3); }
 header .spacer { flex: 1; }
@@ -192,39 +191,6 @@ header .spacer { flex: 1; }
 .gal-dl:hover { background: var(--hover); color: var(--text2); }
 .gal-dl:disabled { opacity: 0.25; cursor: default; }
 
-/* ── API BAR ── */
-.api-bar {
-  flex-shrink: 0; min-height: 46px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  padding: 0 14px;
-  display: flex; align-items: center; gap: 8px;
-}
-.api-lbl { font-size: 11px; color: var(--text3); white-space: nowrap; }
-.api-select {
-  background: var(--bg); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--text2); font-size: 11px;
-  font-family: inherit; padding: 8px 12px; outline: none; cursor: pointer;
-}
-.api-select:focus { border-color: var(--accent); }
-.key-wrap { position: relative; display: flex; align-items: center; flex: 1; max-width: 300px; }
-.key-input {
-  width: 100%; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 4px; color: var(--text2); font-size: 11px;
-  font-family: var(--mono); padding: 8px 32px 8px 12px; outline: none;
-}
-.key-input::placeholder { color: var(--text3); }
-.key-input:focus { border-color: var(--accent); color: var(--text); }
-.key-eye {
-  position: absolute; right: 6px;
-  background: none; border: none; cursor: pointer;
-  font-size: 10px; color: var(--text3); padding: 1px;
-  line-height: 1;
-}
-.key-eye:hover { color: var(--text2); }
-.key-status { font-size: 10px; color: var(--text3); white-space: nowrap; }
-.key-status.ok { color: var(--c-mkt); }
-.api-bar .spacer { flex: 1; }
 
 /* ── LAYOUT ── */
 .layout { display: flex; flex: 1; overflow: hidden; }
@@ -558,7 +524,15 @@ header .spacer { flex: 1; }
 
 <!-- HEADER -->
 <header>
-  <span class="brand">T&F</span>
+  <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+    <defs>
+      <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#f472b6"/>
+        <stop offset="100%" stop-color="#7c3aed"/>
+      </linearGradient>
+    </defs>
+    <circle cx="12" cy="12" r="11" fill="url(#logoGrad)"/>
+  </svg>
   <span class="hdr-sep">/</span>
   <span class="hdr-sub">Image Workflow</span>
   <div class="spacer"></div>
@@ -638,24 +612,6 @@ header .spacer { flex: 1; }
   </div>
 </div>
 
-<!-- API BAR -->
-<div class="api-bar">
-  <span class="api-lbl">Provider</span>
-  <select class="api-select" id="apiProvider" onchange="onProviderChange()">
-    <option value="fal">fal.ai · FLUX Pro 1.1</option>
-    <option value="dalle">OpenAI · DALL·E 3</option>
-  </select>
-  <span class="api-lbl">API Key</span>
-  <div class="key-wrap">
-    <input class="key-input" id="apiKeyInput" type="password"
-           placeholder="Paste your API key and press Enter…"
-           oninput="onKeyInput()" onkeydown="if(event.key==='Enter')onKeyInput()"
-           autocomplete="off" spellcheck="false">
-    <button class="key-eye" onclick="toggleKeyVis()" title="Show/hide">👁</button>
-  </div>
-  <span class="key-status" id="keyStatus">No key set</span>
-  <div class="spacer"></div>
-</div>
 
 <div class="layout">
   <!-- SIDEBAR -->
@@ -976,55 +932,16 @@ const getImg  = id => { try { return localStorage.getItem(imgKey(id)); } catch(e
 const saveImg = (id, v) => { try { localStorage.setItem(imgKey(id), v); } catch(e){ console.warn('Storage full'); } };
 const delImg  = id => { try { localStorage.removeItem(imgKey(id)); } catch(e){}; };
 
-function getApiKey()      { try { return localStorage.getItem('tf_apikey') || ''; } catch(e){ return ''; } }
-function getProvider()    { try { return localStorage.getItem('tf_provider') || 'fal'; } catch(e){ return 'fal'; } }
-function saveProvider(v)  { try { localStorage.setItem('tf_provider', v); } catch(e){}; }
+// ─── WORKER CONFIG ────────────────────────────────────────────────────────────
+// Set this to your Cloudflare Worker URL after deploying
+const WORKER_URL = 'https://image-gen-tool.cynthia-129.workers.dev';
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Restore API key + provider
-  const k = getApiKey();
-  document.getElementById('apiKeyInput').value = k ? '••••••••••••' : '';
-  document.getElementById('apiProvider').value = getProvider();
-  updateKeyStatus(k);
-
   renderSidebar(SERVICES);
   selectService(1);
   updateProgress();
 });
-
-// ─── API KEY ─────────────────────────────────────────────────────────────────
-let rawKey = getApiKey();
-
-function onKeyInput() {
-  const v = document.getElementById('apiKeyInput').value.trim();
-  if (!v || v === '••••••••••••') return;
-  rawKey = v;
-  try { localStorage.setItem('tf_apikey', v); } catch(e){}
-  updateKeyStatus(v);
-}
-
-function updateKeyStatus(k) {
-  const el = document.getElementById('keyStatus');
-  if (k) {
-    el.textContent = 'Key saved ✓';
-    el.className = 'key-status ok';
-  } else {
-    el.textContent = 'No key set';
-    el.className = 'key-status';
-  }
-}
-
-function toggleKeyVis() {
-  const inp = document.getElementById('apiKeyInput');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-function onProviderChange() {
-  const v = document.getElementById('apiProvider').value;
-  saveProvider(v);
-  updatePreview();
-}
 
 // ─── STYLE POPOVER ───────────────────────────────────────────────────────────
 function toggleStylePopover() {
@@ -1304,8 +1221,8 @@ function selectService(id) {
 
   renderCard();
 
-  // Auto-generate if no image and API key present
-  if (!getImg(id) && getApiKey()) {
+  // Auto-generate if no image
+  if (!getImg(id)) {
     const cap = id;
     autoGenTimer = setTimeout(() => {
       if (currentId === cap) generateImage();
@@ -1343,7 +1260,6 @@ function renderCard() {
   const all  = SERVICES.map(x => x.id);
   const pos  = all.indexOf(s.id);
   const cc   = s.cat.toLowerCase();
-  const prov = getProvider() === 'fal' ? 'fal.ai · FLUX Pro 1.1' : 'OpenAI · DALL·E 3';
 
   document.getElementById('serviceCard').innerHTML = `
 
@@ -1370,7 +1286,6 @@ function renderCard() {
           <div class="sec-hdr">
             <span class="sec-label">Image</span>
             <div class="sec-actions">
-              <span class="provider-tag" id="providerTag">${prov}</span>
               <button class="btn" id="regenBtn" onclick="generateImage()">Regenerate</button>
             </div>
           </div>
@@ -1427,16 +1342,8 @@ function renderImgBody() {
   const body = document.getElementById('imgBody');
   if (!body) return;
   const existing = getImg(currentId);
-  const key = getApiKey();
-
   if (existing) {
     showResult(existing);
-  } else if (!key) {
-    body.innerHTML = `
-      <div class="img-noapikey">
-        <strong>Add your API key above</strong> to auto-generate images.<br>
-        <span style="font-size:11px">Get a key at <a href="https://fal.ai" target="_blank" style="color:var(--text2)">fal.ai</a> or <a href="https://platform.openai.com" target="_blank" style="color:var(--text2)">platform.openai.com</a></span>
-      </div>`;
   } else {
     body.innerHTML = `<div class="img-empty">Generating image…</div>`;
   }
@@ -1483,8 +1390,6 @@ function buildPrompt() {
 
 async function generateImage() {
   const capId = currentId;
-  const key   = getApiKey();
-  if (!key) { renderImgBody(); return; }
 
   const body = document.getElementById('imgBody');
   if (body) body.innerHTML = `
@@ -1497,23 +1402,25 @@ async function generateImage() {
   const regenBtn = document.getElementById('regenBtn');
   if (regenBtn) regenBtn.disabled = true;
 
-  const prompt   = buildPrompt();
-  const provider = getProvider();
+  const prompt    = buildPrompt();
+  const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
 
   try {
-    let imgUrl;
-    if (provider === 'fal') {
-      imgUrl = await genFal(prompt, key);
-    } else {
-      imgUrl = await genDalle(prompt, key);
-    }
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, image_size: imageSize })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    if (!data.imageUrl) throw new Error('No image returned');
 
-    if (currentId !== capId) return; // navigated away
+    if (currentId !== capId) return;
 
     // Fetch as blob → data URL for persistent storage + download
-    let dataUrl = imgUrl;
+    let dataUrl = data.imageUrl;
     try {
-      const resp = await fetch(imgUrl);
+      const resp = await fetch(data.imageUrl);
       const blob = await resp.blob();
       dataUrl = await blobToDataUrl(blob);
     } catch(e) { /* fallback to direct URL */ }
@@ -1527,7 +1434,7 @@ async function generateImage() {
     if (b2) b2.innerHTML = `
       <div class="img-error">
         <strong>Generation failed:</strong> ${err.message || 'Unknown error.'}<br>
-        Check your API key and try again.
+        Make sure the Cloudflare Worker is deployed and WORKER_URL is set.
       </div>`;
   } finally {
     if (currentId === capId) {
@@ -1537,47 +1444,6 @@ async function generateImage() {
   }
 }
 
-async function genFal(prompt, key) {
-  const model     = 'fal-ai/flux-pro/v1.1';
-  const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
-  const res = await fetch(`https://fal.run/${model}`, {
-    method: 'POST',
-    headers: { 'Authorization': `Key ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      prompt,
-      image_size: imageSize,
-      num_images: 1,
-      output_format: 'jpeg',
-      safety_tolerance: '2'
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({}));
-    throw new Error(err.detail || err.message || `fal.ai error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.images?.[0]?.url || (() => { throw new Error('No image in response'); })();
-}
-
-async function genDalle(prompt, key) {
-  const res = await fetch('https://api.openai.com/v1/images/generations', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'dall-e-3',
-      prompt,
-      n: 1,
-      size: '1792x1024',
-      quality: 'hd'
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({}));
-    throw new Error(err.error?.message || `OpenAI error ${res.status}`);
-  }
-  const data = await res.json();
-  return data.data?.[0]?.url || (() => { throw new Error('No image in response'); })();
-}
 
 function blobToDataUrl(blob) {
   return new Promise((res, rej) => {
