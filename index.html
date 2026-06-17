@@ -1419,16 +1419,8 @@ async function generateImage() {
 
     if (currentId !== capId) return;
 
-    // Fetch as blob → data URL for persistent storage + download
-    let dataUrl = data.imageUrl;
-    try {
-      const resp = await fetch(data.imageUrl);
-      const blob = await resp.blob();
-      dataUrl = await blobToDataUrl(blob);
-    } catch(e) { /* fallback to direct URL */ }
-
-    saveImg(capId, dataUrl);
-    if (currentId === capId) showResult(dataUrl);
+    saveImg(capId, data.imageUrl);
+    showResult(data.imageUrl);
 
   } catch(err) {
     if (currentId !== capId) return;
