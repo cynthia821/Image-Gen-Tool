@@ -1060,11 +1060,24 @@ function renderGallery() {
   }).join('');
 }
 
+function triggerDownload(dataUrl, fname) {
+  const ext = dataUrl.startsWith('data:image/webp') ? 'webp' : dataUrl.startsWith('data:image/jpeg') ? 'jpg' : 'png';
+  fetch(dataUrl)
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fname + '.' + ext;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+}
+
 function galDownload(fname, id) {
   const img = getImg(id);
   if (!img) return;
-  const a = document.createElement('a');
-  a.href = img; a.download = fname + '.png'; a.click();
+  triggerDownload(img, fname);
 }
 
 // ─── LIGHTBOX ─────────────────────────────────────────────────────────────────
@@ -1113,8 +1126,7 @@ function lbDownload() {
   const img = getImg(lbCurrentId);
   if (!img || !s) return;
   const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-  const a = document.createElement('a');
-  a.href = img; a.download = fname + '.png'; a.click();
+  triggerDownload(img, fname);
 }
 
 // Keyboard nav for lightbox
@@ -1131,10 +1143,7 @@ function bulkDownload() {
   generated.forEach((s, i) => {
     const img = getImg(s.id);
     const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-    setTimeout(() => {
-      const a = document.createElement('a');
-      a.href = img; a.download = fname + '.png'; a.click();
-    }, i * 200); // stagger to avoid browser blocking
+    setTimeout(() => triggerDownload(img, fname), i * 300);
   });
 }
 
@@ -1452,8 +1461,7 @@ function blobToDataUrl(blob) {
 function downloadImg(fname) {
   const img = document.querySelector('#imgBody img');
   if (!img) return;
-  const a = document.createElement('a');
-  a.href = img.src; a.download = fname + '.png'; a.click();
+  triggerDownload(img.src, fname);
 }
 
 function clearImg() {
