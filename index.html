@@ -100,6 +100,7 @@ header .spacer { flex: 1; }
 
 /* Style reference image upload */
 .style-ref-zone {
+  position: relative;
   border: 1px dashed var(--border); border-radius: 4px;
   background: var(--bg); min-height: 80px;
   padding: 8px; cursor: pointer;
@@ -111,7 +112,7 @@ header .spacer { flex: 1; }
 .style-ref-placeholder {
   flex: 1; display: flex; align-items: center; justify-content: center;
   font-size: 11px; color: var(--text3); text-align: center;
-  padding: 12px 8px; pointer-events: none; line-height: 1.6;
+  padding: 12px 8px; cursor: pointer; line-height: 1.6;
   user-select: none;
 }
 .style-ref-thumbs { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -191,6 +192,52 @@ header .spacer { flex: 1; }
 .gal-dl:hover { background: var(--hover); color: var(--text2); }
 .gal-dl:disabled { opacity: 0.25; cursor: default; }
 
+/* ── GALLERY TABS ── */
+.gallery-tabs { display:flex; gap:3px; align-items:center; }
+.gallery-tab {
+  font-size:11px; font-weight:500; padding:5px 14px;
+  border-radius:4px; border:1px solid var(--border);
+  background:var(--surface2); color:var(--text3);
+  cursor:pointer; font-family:inherit;
+  transition:background 0.08s,color 0.08s,border-color 0.08s;
+}
+.gallery-tab:hover { background:var(--hover); color:var(--text2); }
+.gallery-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+/* ── STORY GALLERY ── */
+.gallery-grid--story {
+  grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+}
+.story-gal-group {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; overflow: hidden;
+}
+.story-gal-head {
+  padding: 8px 12px; border-bottom: 1px solid var(--border2);
+  display: flex; align-items: center; gap: 8px;
+}
+.story-gal-svc-name { font-size:11px; font-weight:600; color:var(--text2); flex:1; }
+.story-gal-slots { display:grid; grid-template-columns:repeat(3,1fr); }
+.story-gal-slot { border-right:1px solid var(--border2); display:flex; flex-direction:column; }
+.story-gal-slot:last-child { border-right:none; }
+.story-gal-img {
+  aspect-ratio:16/9; background:var(--bg); overflow:hidden;
+  position:relative; line-height:0;
+}
+.story-gal-img img { width:100%; height:100%; object-fit:cover; display:block; }
+.story-gal-empty {
+  width:100%; aspect-ratio:16/9; display:flex; align-items:center;
+  justify-content:center; color:var(--text3); font-size:10px;
+}
+.story-gal-foot {
+  padding:6px 8px; display:flex; align-items:center; gap:5px;
+  border-top:1px solid var(--border2);
+}
+.story-gal-label {
+  font-size:9px; font-weight:600; text-transform:uppercase;
+  letter-spacing:0.07em; color:var(--text3); flex:1;
+}
+
 
 /* ── LAYOUT ── */
 .layout { display: flex; flex: 1; overflow: hidden; }
@@ -264,7 +311,8 @@ header .spacer { flex: 1; }
 /* ── SERVICE CARD ── */
 .svc-card {
   background: var(--surface); border: 1px solid var(--border);
-  border-radius: 6px; overflow: hidden;
+  border-top: none;
+  border-radius: 0 0 6px 6px; overflow: hidden;
   flex: 1; display: flex; flex-direction: column;
 }
 
@@ -518,6 +566,81 @@ header .spacer { flex: 1; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+
+/* ── BLOCK TABS ── */
+.block-tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 14px;
+  border-bottom: 2px solid var(--border);
+  position: relative;
+}
+.block-tab {
+  font-size: 11px; font-weight: 600;
+  padding: 6px 16px 7px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  background: transparent; color: var(--text3);
+  cursor: pointer; font-family: inherit;
+  position: relative; bottom: -2px;
+  transition: color 0.1s, background 0.1s, border-color 0.1s;
+  letter-spacing: 0.01em;
+}
+.block-tab:hover { color: var(--text2); background: var(--hover); }
+.block-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+  border-bottom-color: var(--surface);
+}
+
+/* ── STORY BLOCK ── */
+.story-block { display:flex; flex-direction:column; flex:1; overflow-y:auto; }
+.story-slot { display:flex; border-bottom:1px solid var(--border2); }
+.story-slot:last-child { border-bottom:none; }
+.story-slot-img {
+  flex:0 0 220px; border-right:1px solid var(--border2);
+  display:flex; flex-direction:column;
+}
+.story-slot-ctrl {
+  flex:1; min-width:0;
+  display:flex; flex-direction:column;
+  padding:12px 16px; gap:6px;
+}
+.story-slot-label {
+  font-size:9px; font-weight:600; letter-spacing:0.08em;
+  text-transform:uppercase; color:var(--text3);
+}
+.story-slot-headline {
+  font-size:12px; font-weight:600; color:var(--text2); line-height:1.4;
+  margin-bottom:2px;
+}
+.story-copy-text {
+  font-size:12px; color:var(--text2); line-height:1.5;
+  padding:7px 9px; background:var(--bg);
+  border:1px solid var(--border2); border-radius:4px;
+  font-style:italic;
+}
+.story-prompt-ta {
+  width:100%; min-height:72px;
+  padding:6px 8px; border:1px solid var(--border); border-radius:4px;
+  font-size:11px; font-family:var(--mono);
+  background:var(--bg); color:var(--text2);
+  resize:vertical; outline:none; line-height:1.5; box-sizing:border-box;
+}
+.story-prompt-ta:focus { border-color:var(--accent); color:var(--text); }
+.story-slot-actions { display:flex; gap:6px; }
+.story-img-body {
+  flex:1; background:var(--bg);
+  display:flex; flex-direction:column; justify-content:center;
+  min-height:120px;
+}
+.story-slot-upload {
+  font-size:10px; text-align:center; padding:4px;
+  border-top:1px solid var(--border2); color:var(--text3);
+}
+.story-slot-upload label { color:var(--text2); cursor:pointer; text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -550,22 +673,19 @@ header .spacer { flex: 1; }
   <div class="sp-body">
     <div class="sp-col">
       <label>Visual Style — appended to every prompt</label>
-      <textarea id="styleDesc" oninput="updatePreview()">Indie editorial illustration style. ONE single chunky figure dominates the frame — large, bold, filling most of the composition. Chunky tubular limbs, rounded oversized head, simple dot nose and small curved eye, expressive through pose and silhouette rather than detail. Bold flat solid color fills: cobalt blue or deep terracotta as the dominant background, with golden yellow, warm orange, cream, dusty olive as accents. Thick consistent dark navy-purple outlines throughout. Flat color with subtle grainy texture. No secondary figures or crowd. Supporting objects and environment are simple, large, and graphic — not detailed or busy. Figures are unclothed or wear minimal abstract shapes only — no realistic clothing details. No true black or white. No text in image. Landscape crop.</textarea>
+      <textarea id="styleDesc" oninput="updatePreview()">Bold flat graphic illustration. No figures, no people, no text, no symbols. Thick flowing organic curves, ribbons, and bands — may take the form of dense nested contour waves, bold parallel color stripes, scattered loose squiggly lines, flat organic blob shapes, single sweeping S-curve ribbons, tangled ribbon loops, or nested concentric arcs. Bright saturated colors on a cream or off-white background. Flat clean illustration with no grain, no noise, and no texture. Retro groovy aesthetic. Every image should look visually distinct from the others in this set.</textarea>
     </div>
     <div class="sp-row">
       <div class="sp-col" style="flex:2">
         <label>Style Reference</label>
         <div class="style-ref-zone" id="styleRefZone"
-             onclick="styleRefZoneClick(event)"
              ondragover="styleRefDragOver(event)"
              ondragleave="styleRefDragLeave(event)"
              ondrop="styleRefDrop(event)">
-          <input type="file" id="styleRefInput" accept="image/*" multiple
-                 style="display:none" onchange="addStyleRefImages(this.files); this.value=''">
           <div class="style-ref-thumbs" id="styleRefThumbs"></div>
-          <div class="style-ref-placeholder" id="styleRefPlaceholder">
+          <label for="styleRefInput" class="style-ref-placeholder" id="styleRefPlaceholder">
             Click or drag &amp; drop images here
-          </div>
+          </label>
         </div>
       </div>
       <div class="sp-col" style="flex:0 0 160px">
@@ -586,7 +706,12 @@ header .spacer { flex: 1; }
 <!-- GALLERY MODAL -->
 <div class="gallery-modal" id="galleryModal">
   <div class="gallery-top">
-    <span class="gallery-title">All Generated Images</span>
+    <span class="gallery-title">Gallery</span>
+    <div class="gallery-tabs">
+      <button class="gallery-tab active" id="galTabHero" onclick="switchGalleryTab('hero')">Hero</button>
+      <button class="gallery-tab" id="galTabStory" onclick="switchGalleryTab('story')">Story Block</button>
+    </div>
+    <div style="flex:1"></div>
     <button class="hdr-btn" onclick="bulkDownload()">↓ Download All</button>
     <button class="hdr-btn" onclick="closeGallery()">✕ Close</button>
   </div>
@@ -638,291 +763,634 @@ const SERVICES = [
   { id:1, cat:"Marketing", type:"Search & Authority", name:"Search Engine Optimization (SEO)",
     def:"The improvement of organic visibility, search performance, technical health, and topical authority within search engines.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure walks a winding forest trail, pushing overgrown branches aside with both arms, making their way forward along a path through dense trees toward a clearing.`},
+    prompt:`A figure walks toward the viewer along a winding forest trail, trees and foliage on either side, a clearing visible in the distance behind them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just SEO consultants, we're growth partners.", prompt: `Nested organic contour curves each following the same flowing shape, warm orange and red on cream, dense fill edge to edge.` },
+      context: { headline: "How we think about organic search.", prompt: `Topographic contour curves flowing across the composition, warm orange and yellow on off-white, moderate view with cream showing at edges.` },
+      outcome: { headline: "What changes when search is working properly.", prompt: `Sparse organic contour lines drifting across open cream, warm orange and hot pink.` },
+    },
+  },
 
   { id:2, cat:"Marketing", type:"Search & Authority", name:"AI Discovery Optimization",
     def:"The optimization of content, technical structures, authority signals, and digital assets to improve visibility within AI-powered discovery platforms.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure adjusts dials on a large control panel, tuning signals that radiate outward across a wide landscape filled with floating data nodes and branching pathways.`},
+    prompt:`A figure adjusts dials on a large control panel, tuning signals that radiate outward across a wide landscape filled with floating data nodes and branching pathways.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just SEO specialists, we're AIO strategists.", prompt: `Dense scattered squiggly wavy lines in warm orange and red on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about AI-powered discovery.", prompt: `Loose scattered wavy lines in warm yellow and hot pink on off-white, moderate airy spacing.` },
+      outcome: { headline: "What changes when AI platforms recognize your authority.", prompt: `A few loose squiggly lines in warm orange and red on generous open cream.` },
+    },
+  },
 
   { id:3, cat:"Marketing", type:"Search & Authority", name:"Technical SEO",
     def:"The optimization of technical website infrastructure to improve crawlability, indexability, performance, and search visibility.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure crouches underground examining a vast root network, the roots spreading intricately in all directions beneath the soil while trees grow above.`},
+    prompt:`A figure kneels at the base of a large tree, one hand tracing the surface roots that branch outward across the ground, studying where each path splits and spreads.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just auditors, we're infrastructure problem solvers.", prompt: `Bold wide parallel diagonal bands in warm red, orange, and yellow, filling frame edge to edge.` },
+      context: { headline: "How we think about technical SEO as a compounding foundation.", prompt: `Parallel diagonal color bands in warm orange and hot pink on cream, moderate view showing band edges.` },
+      outcome: { headline: "What changes when technical SEO is resolved properly.", prompt: `Two wide diagonal bands in warm yellow and orange on generous open cream.` },
+    },
+  },
 
   { id:4, cat:"Marketing", type:"Search & Authority", name:"Local SEO",
     def:"The optimization of local visibility signals to improve discoverability within geographically targeted searches.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure leans over a large neighborhood map pinned to a table, pressing a marker pin into a specific location while surveying the surrounding streets and buildings.`},
+    prompt:`A figure leans over a large neighborhood map pinned to a table, pressing a marker pin into a specific location while surveying the surrounding streets and buildings.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just listing managers, we're local growth partners.", prompt: `Dense nested organic contour curves in warm hot pink, orange, and yellow on cream, fills frame completely.` },
+      context: { headline: "How we think about local search performance.", prompt: `Flowing topographic contour waves in warm orange and red on off-white, moderate loose composition.` },
+      outcome: { headline: "What happens when local audiences can find you consistently.", prompt: `Sparse contour curves in warm hot pink and yellow on generous open cream.` },
+    },
+  },
 
   { id:5, cat:"Marketing", type:"Search & Authority", name:"Enterprise SEO",
     def:"The management of SEO strategy and governance across large, complex digital ecosystems.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure stands at an elevated control desk overlooking a sprawling highway network below, directing traffic flow across dozens of branching routes.`},
+    prompt:`A figure stands at an elevated control desk overlooking a sprawling highway network below, directing traffic flow across dozens of branching routes.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just SEO practitioners, we're enterprise strategists.", prompt: `Dense tangled ribbon loops in warm orange, red, and hot pink overlapping, fills frame edge to edge.` },
+      context: { headline: "How we think about enterprise search performance.", prompt: `Overlapping curved ribbon loops in warm orange and yellow on cream, moderate composition.` },
+      outcome: { headline: "What changes when enterprise SEO is managed properly.", prompt: `Two or three curved ribbon loops in warm hot pink and orange on generous open cream.` },
+    },
+  },
 
   { id:6, cat:"Marketing", type:"Paid Acquisition", name:"Search Engine Marketing (SEM)",
     def:"The management and optimization of paid search campaigns across search advertising platforms.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure operates a large spotlight from an elevated platform, aiming its beam precisely at a single illuminated target on the ground below.`},
+    prompt:`A figure operates a large spotlight from an elevated platform, aiming its beam precisely at a single illuminated target on the ground below.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just campaign managers, we're acquisition strategists.", prompt: `Bold wide parallel diagonal bands in warm yellow, orange, and hot pink, edge-to-edge tight composition.` },
+      context: { headline: "How we think about paid search performance.", prompt: `Parallel diagonal color bands in warm orange and red on cream, moderate view.` },
+      outcome: { headline: "What changes when paid search is managed strategically.", prompt: `Two wide diagonal bands in warm yellow and orange on generous open cream.` },
+    },
+  },
 
   { id:7, cat:"Marketing", type:"Paid Acquisition", name:"Google Ads",
     def:"Strategic planning, management, optimization, and reporting of campaigns within Google's advertising ecosystem.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure launches a paper airplane through a series of target rings in an open field, aiming carefully as other abandoned attempts litter the ground around them.`},
+    prompt:`A figure launches a paper airplane through a series of target rings in an open field, aiming carefully as other abandoned attempts litter the ground around them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just Google Ads managers, we're acquisition partners.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in warm orange and hot pink, fills frame edge to edge.` },
+      context: { headline: "How we think about Google Ads performance.", prompt: `Flowing S-curve ribbon with offset echo lines in warm yellow and orange on cream, moderate crop.` },
+      outcome: { headline: "What happens when Google Ads is managed for outcomes, not activity.", prompt: `Single S-curve ribbon in warm hot pink and red on generous open cream.` },
+    },
+  },
 
   { id:8, cat:"Marketing", type:"Paid Acquisition", name:"Microsoft Ads",
     def:"Strategic planning, management, optimization, and reporting of campaigns within Microsoft's advertising ecosystem.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure stands in a small boat on open water, casting a wide net that spreads broadly above them, multiple distant shores visible on the horizon.`},
+    prompt:`A figure stands in a small boat on open water, one hand gripping a net at their side, multiple distant shores visible on the horizon.`,
+    storyBlock: {
+      diff:    { headline: "Why we don't just mirror Google campaigns, we build distinct strategies.", prompt: `Bold wide parallel diagonal bands in warm orange, red, and hot pink, dense tight crop.` },
+      context: { headline: "How we think about Microsoft Ads as a growth channel.", prompt: `Parallel diagonal bands in warm yellow and orange on cream, moderate view.` },
+      outcome: { headline: "What happens when you stop leaving search audiences on the table.", prompt: `Two wide parallel bands in warm orange and red on generous open cream.` },
+    },
+  },
 
   { id:9, cat:"Marketing", type:"Paid Acquisition", name:"Meta Ads",
     def:"The planning, management, optimization, and reporting of advertising campaigns across Meta's advertising ecosystem.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure sorts through a wall of portrait frames, pulling specific ones forward and arranging the selected frames into a curated display.`},
+    prompt:`A figure sorts through a wall of portrait frames, pulling specific ones forward and arranging the selected frames into a curated display.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just running ads, we're building audience strategies.", prompt: `Dense flat organic blob shapes in warm orange, hot pink, and red overlapping across cream, fills frame.` },
+      context: { headline: "How we think about Meta advertising performance.", prompt: `Overlapping flat organic blob forms in warm yellow and orange on off-white, moderate composition.` },
+      outcome: { headline: "What changes when Meta Ads is managed with strategy and precision.", prompt: `Two or three flat organic blob shapes in warm hot pink and orange on generous open cream.` },
+    },
+  },
 
   { id:10, cat:"Marketing", type:"Content Systems", name:"Content Marketing",
     def:"The development of content programs that educate audiences, improve discoverability, and support conversion.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure tends rows of growing plants at different stages — kneeling to water seedlings while fully bloomed plants tower beside them in a wide garden.`},
+    prompt:`A figure tends rows of growing plants at different stages — kneeling to water seedlings while fully bloomed plants tower beside them in a wide garden.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just content producers, we're content strategists.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in warm hot pink and orange, fills frame completely.` },
+      context: { headline: "How we think about content that compounds.", prompt: `Flowing S-curve ribbon with echo lines in warm yellow and red on cream, moderate crop.` },
+      outcome: { headline: "What happens when content is built to perform, not just to publish.", prompt: `Single S-curve ribbon in warm orange and yellow on generous open cream.` },
+    },
+  },
 
   { id:11, cat:"Marketing", type:"Content Systems", name:"Content Strategy",
     def:"The planning and governance of content initiatives aligned to organizational objectives.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure unrolls a large blueprint across a wide table, pointing to mapped pathways and key routes while documents and notes surround them.`},
+    prompt:`A figure leans over a large blueprint spread across a table, one hand tracing a route while documents and notes are arranged around them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just content planners, we're content architects.", prompt: `Bold wide parallel diagonal bands in warm orange, yellow, and hot pink, fills frame edge to edge.` },
+      context: { headline: "How we think about content strategy and governance.", prompt: `Parallel diagonal color bands in warm red and orange on cream, moderate view showing edges.` },
+      outcome: { headline: "What changes when content is built on strategy rather than habit.", prompt: `Two wide diagonal bands in warm yellow and orange on generous open cream.` },
+    },
+  },
 
   { id:12, cat:"Marketing", type:"Content Systems", name:"Editorial Planning",
     def:"The structured planning of content production, publication, and optimization efforts.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure arranges illustrated tiles across a large calendar grid on the floor, stepping back to examine the full layout before repositioning a tile.`},
+    prompt:`A figure arranges illustrated tiles across a large calendar grid on the floor, stepping back to examine the full layout before repositioning a tile.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just content schedulers, we're editorial architects.", prompt: `Dense nested organic contour waves in warm hot pink, yellow, and orange on cream, fills frame completely.` },
+      context: { headline: "How we think about editorial planning as infrastructure.", prompt: `Flowing topographic contour curves in warm orange and red on off-white, moderate composition.` },
+      outcome: { headline: "What changes when editorial planning works properly.", prompt: `Sparse organic contour lines in warm yellow and hot pink on generous open cream.` },
+    },
+  },
 
   { id:13, cat:"Marketing", type:"Content Systems", name:"Content Governance",
     def:"The creation of standards, workflows, and processes that govern content creation and management.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure stands at a tall filing system, sorting labeled folders into organized channels while reviewing a checklist clipped to a board beside them.`},
+    prompt:`A figure stands at a tall filing system, sorting labeled folders into organized channels while reviewing a checklist clipped to a board beside them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just editors, we're content system architects.", prompt: `Bold wide parallel diagonal bands in warm red, hot pink, and orange, tight edge-to-edge crop.` },
+      context: { headline: "How we think about content governance as an operational system.", prompt: `Parallel diagonal bands in warm orange and yellow on cream, moderate view.` },
+      outcome: { headline: "What changes when content governance is working properly.", prompt: `Two wide parallel bands in warm orange and red on generous open cream.` },
+    },
+  },
 
   { id:14, cat:"Marketing", type:"Lifecycle & Retention", name:"Email Marketing",
     def:"The use of email communications to nurture, engage, and retain audiences.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure stands at an open window releasing envelopes into the sky, each one folding into a small plane and flying toward a different destination on the horizon.`},
+    prompt:`A figure stands at an open window, a stack of envelopes beside them, watching small paper planes drift outward toward different destinations on the horizon.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just email senders, we're relationship builders.", prompt: `Dense scattered squiggly wavy lines in warm yellow, orange, and hot pink on cream, fills frame.` },
+      context: { headline: "How we think about email as a relationship channel.", prompt: `Loose scattered wavy lines in warm orange and red on off-white, moderate airy composition.` },
+      outcome: { headline: "What happens when email is managed as a strategic channel.", prompt: `A few loose squiggly lines in warm hot pink and yellow on generous open cream.` },
+    },
+  },
 
   { id:15, cat:"Marketing", type:"Lifecycle & Retention", name:"Marketing Automation",
     def:"The automation of marketing communications and workflows.",
     outcomes:["Continuity","Growth"],
-    prompt:`A figure carefully sets the first domino in a long intricate chain, stepping back to watch the cascade trigger through multiple automated stages stretching into the distance.`},
+    prompt:`A figure carefully sets the first domino in a long intricate chain, stepping back to watch the cascade trigger through multiple automated stages stretching into the distance.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just automation configurers, we're engagement systems designers.", prompt: `Dense tangled ribbon loops in warm orange, yellow, and red overlapping, fills frame completely.` },
+      context: { headline: "How we think about marketing automation as a growth system.", prompt: `Overlapping curved ribbon loops in warm hot pink and orange on cream, moderate composition.` },
+      outcome: { headline: "What changes when marketing automation is built properly.", prompt: `Two or three curved ribbon loops in warm orange and yellow on generous open cream.` },
+    },
+  },
 
   { id:16, cat:"Marketing", type:"Conversion Systems", name:"Conversion Rate Optimization (CRO)",
     def:"Structured experimentation and optimization focused on improving conversion performance.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure adjusts the wide opening of a large funnel structure, widening it as more material flows smoothly through toward the output below.`},
+    prompt:`A figure adjusts the wide opening of a large funnel structure, widening it as more material flows smoothly through toward the output below.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just A/B testers, we're performance strategists.", prompt: `Dense nested concentric arcs in warm orange, red, and hot pink on cream, tight crop filling frame.` },
+      context: { headline: "How we think about conversion as a system.", prompt: `Concentric arc bands in warm orange and yellow on off-white, moderate composition.` },
+      outcome: { headline: "What changes when conversion is actively optimized.", prompt: `Sparse concentric arcs in warm hot pink and orange on generous open cream.` },
+    },
+  },
 
   { id:17, cat:"Marketing", type:"Conversion Systems", name:"Landing Page Optimization",
     def:"The optimization of landing page experiences to improve conversion performance.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure pushes open a wide gateway archway with both arms, the opening widening as a clear path extends forward into the space beyond.`},
+    prompt:`A figure leans into a wide gateway archway with one shoulder forward, pushing it open as a clear path extends into the space beyond.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just page builders, we're conversion architects.", prompt: `Dense flat organic blob shapes in warm hot pink, orange, and yellow on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about landing pages as conversion infrastructure.", prompt: `Overlapping flat organic blob forms in warm orange and red on off-white, moderate view.` },
+      outcome: { headline: "What changes when landing pages are optimized properly.", prompt: `Two or three flat organic blob shapes in warm yellow and orange on generous open cream.` },
+    },
+  },
 
   { id:18, cat:"Marketing", type:"Analytics & Optimization", name:"Analytics & Performance Measurement",
     def:"The collection, interpretation, reporting, and optimization of performance data across digital initiatives.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure peers through a large telescope from an observation platform, pointing at a constellation of connected data points spread across the sky above.`},
+    prompt:`Abstract constellation of interconnected circular nodes in cobalt blue and golden yellow, branching outward from a dense central cluster through a network of fine lines.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just dashboard builders, we're measurement strategists.", prompt: `Dense scattered squiggly wavy lines in warm orange and hot pink on cream, fills frame completely.` },
+      context: { headline: "How we think about analytics as a decision-making system.", prompt: `Loose scattered wavy lines in warm yellow and orange on off-white, moderate spacing.` },
+      outcome: { headline: "What changes when performance measurement is built properly.", prompt: `A few loose squiggly lines in warm orange and hot pink on generous open cream.` },
+    },
+  },
 
   { id:19, cat:"Marketing", type:"Analytics & Optimization", name:"Attribution Analysis",
     def:"The evaluation of marketing and digital touchpoints to understand performance contribution.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure crouches over a large table covered in a web of colored threads, tracing each one back through the network to find its origin point.`},
+    prompt:`Abstract composition of colored threads in terracotta, cobalt blue, and dusty pink, all converging and tracing back to a single origin point from across a wide surface.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just analytics practitioners, we're performance accountants.", prompt: `Dense tangled ribbon loops in warm red, orange, and yellow overlapping, fills frame edge to edge.` },
+      context: { headline: "How we think about attribution as a strategic discipline.", prompt: `Overlapping curved ribbon loops in warm hot pink and orange on cream, moderate composition.` },
+      outcome: { headline: "What changes when attribution is understood clearly.", prompt: `Two or three curved ribbon loops in warm orange and yellow on generous open cream.` },
+    },
+  },
 
   { id:20, cat:"Marketing", type:"Analytics & Optimization", name:"Reporting & Insights",
     def:"The ongoing communication of performance trends, opportunities, and outcomes.",
     outcomes:["Continuity","Growth"],
-    prompt:`A figure pulls back a heavy curtain to reveal a large display panel covered in charts, graphs, and performance visualizations behind it.`},
+    prompt:`A figure pulls back a heavy curtain to reveal a large display panel covered in charts, graphs, and performance visualizations behind it.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just report writers, we're performance interpreters.", prompt: `Dense nested concentric arcs in warm orange, hot pink, and red on cream, tight dense crop.` },
+      context: { headline: "How we think about reporting as a strategic communication tool.", prompt: `Concentric arc bands in warm orange and yellow on off-white, moderate composition.` },
+      outcome: { headline: "What changes when reporting is built for clarity and direction.", prompt: `Sparse concentric arcs in warm hot pink and orange on generous open cream.` },
+    },
+  },
 
   { id:21, cat:"Design", type:"Web Design", name:"Website Design",
     def:"The design of website experiences that communicate value, guide users, and support organizational goals.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure sculpts the shape of a large webpage frame from raw material, carefully defining each section while sketches and references hang on the wall behind them.`},
+    prompt:`A figure sculpts the shape of a large webpage frame from raw material, carefully defining each section while sketches and references hang on the wall behind them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just web designers, we're digital experience strategists.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in cool blue and violet, fills frame edge to edge.` },
+      context: { headline: "How we think about website design as a decision-support system.", prompt: `Flowing S-curve ribbon with echo lines in cool indigo and blue on cream, moderate crop.` },
+      outcome: { headline: "What changes when a website is designed for its audience.", prompt: `Single S-curve ribbon in cool violet and soft pink on generous open cream.` },
+    },
+  },
 
   { id:22, cat:"Design", type:"Web Design", name:"Prototyping",
     def:"The creation of interactive or visual design models that help stakeholders evaluate experience and functionality before development.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure examines a row of small-scale architectural models on a long studio table, comparing designs at different stages from rough sketches to refined finished models.`},
+    prompt:`A figure examines a row of small-scale architectural models on a long studio table, comparing designs at different stages from rough sketches to refined finished models.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just mockup producers, we're decision accelerators.", prompt: `Dense flat organic blob shapes in cool blue, indigo, and violet on cream, fills frame completely.` },
+      context: { headline: "How we think about prototyping as a risk reduction tool.", prompt: `Overlapping flat organic blob forms in cool violet and lilac on off-white, moderate composition.` },
+      outcome: { headline: "What changes when design decisions are validated before development.", prompt: `Two or three flat organic blob shapes in cool blue and soft pink on generous open cream.` },
+    },
+  },
 
   { id:23, cat:"Design", type:"Web Design", name:"Information Architecture",
     def:"The organization of website content, navigation, page relationships, and user pathways.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure arranges labeled cards into a clear branching tree structure on the floor, connecting them with string and stepping back to evaluate the hierarchy.`},
+    prompt:`A figure arranges labeled cards into a clear branching tree structure on the floor, connecting them with string and stepping back to evaluate the hierarchy.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just site mappers, we're experience organizers.", prompt: `Dense nested organic contour curves in cool indigo, blue, and violet on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about information architecture as user trust.", prompt: `Flowing topographic contour waves in cool blue and soft pink on off-white, moderate composition.` },
+      outcome: { headline: "What changes when information architecture is designed properly.", prompt: `Sparse organic contour curves in cool violet and indigo on generous open cream.` },
+    },
+  },
 
   { id:24, cat:"Design", type:"Brand Identity", name:"Visual Identity Development",
     def:"The creation or evolution of the visual system that represents the organization.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure holds a glass prism up toward the light, watching the refracted colors spread outward into a coherent pattern across the surface in front of them.`},
+    prompt:`A figure stands at a table examining a glass prism, refracted colors spreading across the surface in front of them in a coherent pattern.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just designers, we're brand architects.", prompt: `Dense nested concentric arcs in cool blue, violet, indigo, and lilac on cream, tight dense crop.` },
+      context: { headline: "How we think about visual identity as a long-term asset.", prompt: `Concentric arc bands in cool violet and blue on off-white, moderate composition.` },
+      outcome: { headline: "What changes when visual identity is built as a system.", prompt: `Sparse concentric arcs in cool indigo and soft pink on generous open cream.` },
+    },
+  },
 
   { id:25, cat:"Design", type:"Brand Identity", name:"Logo Design",
     def:"The creation or refinement of a primary visual mark for an organization, product, or initiative.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure makes a single bold mark with a wide brush on a large canvas propped against a wall, stepping back to examine the confident stroke.`},
+    prompt:`A figure makes a single bold mark with a wide brush on a large canvas propped against a wall, stepping back to examine the confident stroke.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just logo designers, we're brand mark strategists.", prompt: `Large bold S-curve ribbon with parallel echo lines in cool violet and blue, fills frame edge to edge.` },
+      context: { headline: "How we think about logo design as strategic communication.", prompt: `Flowing S-curve ribbon with echo lines in cool indigo and lilac on cream, moderate crop.` },
+      outcome: { headline: "What changes when a logo is designed with strategic intent.", prompt: `Single S-curve ribbon in cool blue and soft pink on generous open cream.` },
+    },
+  },
 
   { id:26, cat:"Design", type:"Brand Identity", name:"Brand Guidelines",
     def:"The documentation of brand standards, usage rules, visual systems, and communication guidelines.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure binds together a large illustrated reference book at a desk, surrounded by organized color swatches, typography samples, and specimen sheets on shelves.`},
+    prompt:`A figure binds together a large illustrated reference book at a desk, surrounded by organized color swatches, typography samples, and specimen sheets on shelves.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just document producers, we're governance enablers.", prompt: `Bold wide parallel diagonal bands in cool blue, indigo, and violet, edge-to-edge composition.` },
+      context: { headline: "How we think about brand guidelines as operational infrastructure.", prompt: `Parallel diagonal bands in cool violet and lilac on cream, moderate view.` },
+      outcome: { headline: "What changes when guidelines are built for real-world use.", prompt: `Two wide parallel bands in cool blue and soft pink on generous open cream.` },
+    },
+  },
 
   { id:27, cat:"Design", type:"Brand Identity", name:"Brand Architecture",
     def:"The organization of brands, sub-brands, products, services, and naming relationships within a broader identity system.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure draws a branching organizational chart on a large whiteboard, arranging labeled boxes into a clear hierarchy and connecting them with lines.`},
+    prompt:`A figure draws a branching organizational chart on a large whiteboard, arranging labeled boxes into a clear hierarchy and connecting them with lines.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just naming consultants, we're portfolio strategists.", prompt: `Dense nested organic contour waves in cool violet, indigo, and blue on cream, fills frame completely.` },
+      context: { headline: "How we think about brand architecture as strategic clarity.", prompt: `Flowing topographic contour curves in cool blue and lilac on off-white, moderate composition.` },
+      outcome: { headline: "What changes when brand architecture is designed with intent.", prompt: `Sparse organic contour lines in cool indigo and violet on generous open cream.` },
+    },
+  },
 
   { id:28, cat:"Design", type:"Design Systems", name:"Design System Development",
     def:"The creation of reusable design patterns, components, standards, and documentation.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure snaps modular building blocks together on a workshop table, assembling a growing unified structure from distinct reusable components.`},
+    prompt:`A figure snaps modular building blocks together on a workshop table, assembling a growing unified structure from distinct reusable components.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just component builders, we're design infrastructure architects.", prompt: `Dense tangled ribbon loops in cool blue, violet, and indigo overlapping, fills frame edge to edge.` },
+      context: { headline: "How we think about design systems as organizational infrastructure.", prompt: `Overlapping curved ribbon loops in cool indigo and soft pink on cream, moderate composition.` },
+      outcome: { headline: "What changes when a design system is working properly.", prompt: `Two or three curved ribbon loops in cool blue and violet on generous open cream.` },
+    },
+  },
 
   { id:29, cat:"Design", type:"Marketing Design", name:"Campaign Design",
     def:"The design of creative assets for campaigns, promotions, launches, and marketing initiatives.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure works on a large vibrant mural, bold characters and shapes filling the wall as the composition grows around them.`},
+    prompt:`A figure works on a large vibrant mural, bold characters and shapes filling the wall as the composition grows around them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just asset producers, we're campaign creative partners.", prompt: `Dense flat organic blob shapes in cool violet, blue, and lilac on cream, fills frame completely.` },
+      context: { headline: "How we think about design in the service of campaign performance.", prompt: `Overlapping flat organic blob forms in cool indigo and blue on off-white, moderate composition.` },
+      outcome: { headline: "What changes when campaign creative is designed strategically.", prompt: `Two or three flat organic blob shapes in cool violet and soft pink on generous open cream.` },
+    },
+  },
 
   { id:30, cat:"Design", type:"Marketing Design", name:"Advertising Creative",
     def:"The creation of visual assets for paid campaigns and promotional channels.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure holds up a large bold poster, arms fully extended, the striking composition front and center against an open background.`},
+    prompt:`A figure stands beside a large bold poster propped against a wall, one arm gesturing toward it as the striking composition draws the eye.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just banner designers, we're conversion creative specialists.", prompt: `Bold wide parallel diagonal bands in cool indigo, blue, and violet, tight edge-to-edge crop.` },
+      context: { headline: "How we think about ad creative as performance infrastructure.", prompt: `Parallel diagonal bands in cool violet and soft pink on cream, moderate view.` },
+      outcome: { headline: "What changes when advertising creative is designed for performance.", prompt: `Two wide diagonal bands in cool blue and indigo on generous open cream.` },
+    },
+  },
 
   { id:31, cat:"Design", type:"Marketing Design", name:"Social Media Design",
     def:"The creation of designed assets for social platforms and audience engagement.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure frames a scene through a rectangular viewfinder formed with their hands, composing a shot from a lively scene unfolding in front of them.`},
+    prompt:`A figure stands with a small camera, composing a shot of a lively scene unfolding in front of them, studying the framing carefully.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just social designers, we're brand consistency partners.", prompt: `Dense scattered squiggly wavy lines in cool blue, violet, and soft pink on cream, fills frame.` },
+      context: { headline: "How we think about social design as brand expression.", prompt: `Loose scattered wavy lines in cool indigo and lilac on off-white, moderate airy composition.` },
+      outcome: { headline: "What changes when social design is built with consistency and purpose.", prompt: `A few loose squiggly lines in cool violet and blue on generous open cream.` },
+    },
+  },
 
   { id:32, cat:"Design", type:"Marketing Design", name:"Sales Collateral Design",
     def:"The design of materials that support business development, sales conversations, and stakeholder communication.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure lays out a set of precisely designed documents across a wide presentation table, arranging each piece purposefully for a presentation.`},
+    prompt:`A figure lays out a set of precisely designed documents across a wide presentation table, arranging each piece purposefully for a presentation.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just deck designers, we're sales enablement partners.", prompt: `Bold wide parallel diagonal bands in cool violet, soft pink, and indigo, dense edge-to-edge crop.` },
+      context: { headline: "How we think about collateral as a sales enablement tool.", prompt: `Parallel diagonal bands in cool blue and violet on cream, moderate view.` },
+      outcome: { headline: "What changes when sales collateral is designed with intent.", prompt: `Two wide parallel bands in cool indigo and lilac on generous open cream.` },
+    },
+  },
 
   { id:33, cat:"Design", type:"Product Design", name:"Product UX Design",
     def:"The design of user flows, structures, and interactions for digital products or applications.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure removes obstacles from a winding path, each cleared section becoming straighter and more direct as they work their way forward.`},
+    prompt:`A figure removes obstacles from a winding path, each cleared section becoming straighter and more direct as they work their way forward.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just flow designers, we're product experience strategists.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in cool indigo and violet, fills frame edge to edge.` },
+      context: { headline: "How we think about UX as a product growth lever.", prompt: `Flowing S-curve ribbon with offset echo lines in cool blue and lilac on cream, moderate crop.` },
+      outcome: { headline: "What changes when UX design is taken seriously.", prompt: `Single S-curve ribbon in cool violet and soft pink on generous open cream.` },
+    },
+  },
 
   { id:34, cat:"Design", type:"Product Design", name:"Product UI Design",
     def:"The visual and interface design of digital products, applications, and software experiences.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure polishes a large flat surface with a cloth, each pass revealing crisp refined details, clean edges, and precise visual elements beneath.`},
+    prompt:`A figure polishes a large flat surface with a cloth, each pass revealing crisp refined details, clean edges, and precise visual elements beneath.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just skin designers, we're interface quality partners.", prompt: `Dense flat organic blob shapes in cool blue, soft pink, and indigo on cream, fills frame completely.` },
+      context: { headline: "How we think about UI design as product quality.", prompt: `Overlapping flat organic blob forms in cool violet and blue on off-white, moderate view.` },
+      outcome: { headline: "What changes when product UI design is done well.", prompt: `Two or three flat organic blob shapes in cool lilac and indigo on generous open cream.` },
+    },
+  },
 
   { id:35, cat:"Design", type:"Product Design", name:"User Research",
     def:"The discovery and analysis of user needs, behaviors, pain points, and expectations.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure sits at a table with a notepad open, leaning forward attentively with pen in hand, listening carefully and taking detailed notes.`},
+    prompt:`A figure sits at a table with a notepad open, leaning forward attentively with pen in hand, listening carefully and taking detailed notes.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just data gatherers, we're insight translators.", prompt: `Dense scattered squiggly wavy lines in cool violet, indigo, and blue on cream, fills frame.` },
+      context: { headline: "How we think about user research as a product risk reduction tool.", prompt: `Loose scattered wavy lines in cool soft pink and violet on off-white, moderate spacing.` },
+      outcome: { headline: "What changes when design is grounded in real user understanding.", prompt: `A few loose squiggly lines in cool blue and lilac on generous open cream.` },
+    },
+  },
 
   { id:36, cat:"Design", type:"Design Systems", name:"Design Governance",
     def:"The creation of standards, processes, and oversight mechanisms that ensure design consistency across teams and products.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure trims and tends a formal structured garden with precision shears, maintaining the orderly rows, proportions, and clipped shapes with care.`},
+    prompt:`A figure trims and tends a formal structured garden with precision shears, maintaining the orderly rows, proportions, and clipped shapes with care.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just reviewers, we're design systems stewards.", prompt: `Dense nested organic contour waves in cool blue, soft pink, and violet on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about governance as scalable design quality.", prompt: `Flowing topographic contour curves in cool indigo and blue on off-white, moderate composition.` },
+      outcome: { headline: "What changes when design governance is built properly.", prompt: `Sparse organic contour lines in cool violet and soft pink on generous open cream.` },
+    },
+  },
 
   { id:37, cat:"Design", type:"Design Systems", name:"Enterprise Design Systems",
     def:"The creation of large-scale design systems that support multiple products, websites, teams, and brands within complex organizations.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure walks along an elevated walkway surveying a vast organized grid of components stretching below, reviewing each color-coded section.`},
+    prompt:`A figure walks along an elevated walkway surveying a vast organized grid of components stretching below, reviewing each color-coded section.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just design system builders, we're enterprise design infrastructure partners.", prompt: `Dense tangled ribbon loops in cool violet, indigo, and blue on cream, fills frame completely.` },
+      context: { headline: "How we think about enterprise design systems as long-term infrastructure.", prompt: `Overlapping curved ribbon loops in cool blue and lilac on cream, moderate composition.` },
+      outcome: { headline: "What changes when an enterprise design system is working properly.", prompt: `Two or three curved ribbon loops in cool indigo and soft pink on generous open cream.` },
+    },
+  },
 
   { id:38, cat:"Development", type:"Front-End", name:"Responsive Development",
     def:"The implementation of digital experiences that function effectively across desktop, tablet, and mobile devices.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure stretches a flexible panel between three different frame sizes — large, medium, and small — the content within each adapting perfectly as they pull.`},
+    prompt:`A figure adjusts a flexible panel to fit a new frame, one hand guiding the edge while three frames of different sizes are arranged nearby.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just mobile-friendly checkers, we're multi-device experience builders.", prompt: `Dense nested concentric arcs in lime green, cyan, and teal on cream, tight dense crop.` },
+      context: { headline: "How we think about responsive development as baseline quality.", prompt: `Concentric arc bands in green and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when responsive development is done properly.", prompt: `Sparse concentric arcs in lime and cyan on generous open cream.` },
+    },
+  },
 
   { id:39, cat:"Development", type:"Front-End", name:"Accessibility Implementation",
     def:"The implementation of accessibility standards and best practices within digital experiences.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure builds a wide gently sloping ramp leading up to a building entrance, laying sections of path with care and checking levels as they work.`},
+    prompt:`A figure builds a wide gently sloping ramp leading up to a building entrance, laying sections of path with care and checking levels as they work.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just compliance checkers, we're inclusive experience builders.", prompt: `Bold wide parallel diagonal bands in lime green, teal, and cyan, edge-to-edge composition.` },
+      context: { headline: "How we think about accessibility as a quality standard.", prompt: `Parallel diagonal bands in green and teal on cream, moderate view showing band edges.` },
+      outcome: { headline: "What changes when accessibility is implemented properly.", prompt: `Two wide parallel bands in lime and cyan on generous open cream.` },
+    },
+  },
 
   { id:40, cat:"Development", type:"Front-End", name:"Performance Optimization",
     def:"The optimization of front-end code, assets, and delivery mechanisms to improve speed and user experience.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure fine-tunes a compact precision machine, removing friction points as the mechanism visibly speeds up and runs more efficiently.`},
+    prompt:`A figure fine-tunes a compact precision machine, removing friction points as the mechanism visibly speeds up and runs more efficiently.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just speed testers, we're front-end performance engineers.", prompt: `Bold wide parallel diagonal bands in cyan, lime green, and teal, tight edge-to-edge crop.` },
+      context: { headline: "How we think about performance as compounding user experience.", prompt: `Parallel diagonal bands in teal and green on cream, moderate view.` },
+      outcome: { headline: "What changes when performance optimization is completed properly.", prompt: `Two wide diagonal bands in lime and cyan on generous open cream.` },
+    },
+  },
 
   { id:41, cat:"Development", type:"Back-End", name:"Custom Application Development",
     def:"The creation of custom functionality, applications, and systems that support specific organizational requirements.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure engineers a custom machine from raw parts on a large workshop floor, assembling components into something entirely new and purposeful.`},
+    prompt:`A figure engineers a custom machine from raw parts on a large workshop floor, assembling components into something entirely new and purposeful.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just developers, we're capability partners.", prompt: `Dense tangled ribbon loops in lime green, teal, and cyan overlapping, fills frame edge to edge.` },
+      context: { headline: "How we think about custom development as organizational capability.", prompt: `Overlapping curved ribbon loops in green and teal on cream, moderate composition.` },
+      outcome: { headline: "What changes when the right custom application is built.", prompt: `Two or three curved ribbon loops in cyan and lime on generous open cream.` },
+    },
+  },
 
   { id:42, cat:"Development", type:"Back-End", name:"CMS Development",
     def:"The implementation and customization of content management systems to support organizational content operations.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure organizes a large modular library, labeling sections, rearranging shelves, and placing content systematically so everything is easy to find.`},
+    prompt:`A figure organizes a large modular library, labeling sections, rearranging shelves, and placing content systematically so everything is easy to find.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just CMS installers, we're content ecosystem architects.", prompt: `Dense nested organic contour waves in lime green, teal, and cyan on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about CMS as editorial infrastructure.", prompt: `Flowing topographic contour curves in green and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when CMS is implemented properly.", prompt: `Sparse organic contour lines in lime and cyan on generous open cream.` },
+    },
+  },
 
   { id:43, cat:"Development", type:"Back-End", name:"Custom Platform Extensions",
     def:"The development of custom functionality that extends the capabilities of an existing platform.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure attaches new modular sections to a large existing structure, bolting extensions outward and upward to grow its capabilities.`},
+    prompt:`A figure attaches new modular sections to a large existing structure, bolting extensions outward and upward to grow its capabilities.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just plugin developers, we're platform capability partners.", prompt: `Dense flat organic blob shapes in lime green, teal, and cyan on cream, fills frame completely.` },
+      context: { headline: "How we think about platform extension as targeted capability investment.", prompt: `Overlapping flat organic blob forms in green and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when custom extensions are built properly.", prompt: `Two or three flat organic blob shapes in cyan and lime on generous open cream.` },
+    },
+  },
 
   { id:44, cat:"Development", type:"Maintenance", name:"Website Maintenance",
     def:"The ongoing support and upkeep of websites and digital platforms to ensure continued operation and performance.",
     outcomes:["Continuity","Growth"],
-    prompt:`A figure prunes, waters, and repairs a thriving mixed landscape of organic and architectural elements, keeping everything in careful working order.`},
+    prompt:`A figure prunes, waters, and repairs a thriving mixed landscape of organic and architectural elements, keeping everything in careful working order.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just support ticketers, we're digital property stewards.", prompt: `Bold wide parallel diagonal bands in teal, green, and lime, tight edge-to-edge composition.` },
+      context: { headline: "How we think about maintenance as protection of digital investment.", prompt: `Parallel diagonal bands in cyan and green on cream, moderate view.` },
+      outcome: { headline: "What changes when website maintenance is handled properly.", prompt: `Two wide parallel bands in teal and lime on generous open cream.` },
+    },
+  },
 
   { id:45, cat:"Development", type:"Maintenance", name:"Security & Platform Updates",
     def:"The application of security improvements, patches, and platform upgrades that reduce risk and maintain long-term stability.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure reinforces the walls of a structure from inside, sealing gaps and installing protective plates with precision tools.`},
+    prompt:`A figure reinforces the walls of a structure from inside, sealing gaps and installing protective plates with precision tools.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just updaters, we're security stewards.", prompt: `Dense nested concentric arcs in teal, cyan, and lime green on cream, tight dense crop.` },
+      context: { headline: "How we think about security updates as ongoing risk management.", prompt: `Concentric arc bands in green and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when security and platform updates are managed properly.", prompt: `Sparse concentric arcs in cyan and lime on generous open cream.` },
+    },
+  },
 
   { id:46, cat:"Development", type:"Maintenance", name:"Monitoring & Support",
     def:"The proactive monitoring, troubleshooting, and resolution of issues across digital platforms and systems.",
     outcomes:["Continuity","Growth"],
-    prompt:`A figure stands alert at the top of a tall watchtower, scanning the wide landscape below, watching for anything that needs attention.`},
+    prompt:`A figure stands alert at the top of a tall watchtower, scanning the wide landscape below, watching for anything that needs attention.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just ticket responders, we're infrastructure watchdogs.", prompt: `Dense scattered squiggly wavy lines in lime green, teal, and cyan on cream, fills frame.` },
+      context: { headline: "How we think about monitoring as operational confidence.", prompt: `Loose scattered wavy lines in green and teal on off-white, moderate spacing.` },
+      outcome: { headline: "What changes when monitoring and support is handled properly.", prompt: `A few loose squiggly lines in cyan and lime on generous open cream.` },
+    },
+  },
 
   { id:47, cat:"Development", type:"APIs", name:"API Development",
     def:"The creation of application programming interfaces that allow systems to exchange data and functionality.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure constructs a precise bridge between two elevated platforms separated by open space, bolting beams into place as the structure takes shape.`},
+    prompt:`Abstract composition of two geometric system blocks in terracotta and cobalt blue, connected by flowing data channels in golden yellow with small nodes moving between them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just endpoint builders, we're integration infrastructure architects.", prompt: `Dense tangled ribbon loops in teal, green, and cyan overlapping, fills frame edge to edge.` },
+      context: { headline: "How we think about API design as long-term infrastructure.", prompt: `Overlapping curved ribbon loops in lime and teal on cream, moderate composition.` },
+      outcome: { headline: "What changes when APIs are designed and built properly.", prompt: `Two or three curved ribbon loops in green and cyan on generous open cream.` },
+    },
+  },
 
   { id:48, cat:"Development", type:"APIs", name:"API Integrations",
     def:"The implementation of connections between internal and external systems through APIs.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure connects two large pipe systems with a coupling, tightening the joint as flow immediately begins moving between the two previously separate systems.`},
+    prompt:`Abstract diagram of two distinct pipe systems in terracotta and olive, joined at a central coupling with flow lines in golden yellow moving between them.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just integration configurers, we're workflow engineers.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in lime green and teal, fills frame edge to edge.` },
+      context: { headline: "How we think about API integrations as operational efficiency.", prompt: `Flowing S-curve ribbon with echo lines in cyan and green on cream, moderate crop.` },
+      outcome: { headline: "What changes when platforms are connected properly.", prompt: `Single S-curve ribbon in teal and lime on generous open cream.` },
+    },
+  },
 
   { id:49, cat:"Development", type:"APIs", name:"Middleware Development",
     def:"The creation of intermediary systems that facilitate communication and workflows between platforms.",
     outcomes:["Actualization","Continuity"],
-    prompt:`A figure stands at the center bridging two distinct environments — one side mechanical and angular, the other organic and flowing — acting as the connecting point between both worlds.`},
+    prompt:`A figure stands at the center bridging two distinct environments — one side mechanical and angular, the other organic and flowing — acting as the connecting point between both worlds.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just glue code writers, we're integration architecture partners.", prompt: `Dense flat organic blob shapes in cyan, lime, and green on cream, fills frame completely.` },
+      context: { headline: "How we think about middleware as operational infrastructure.", prompt: `Overlapping flat organic blob forms in teal and cyan on off-white, moderate view.` },
+      outcome: { headline: "What changes when middleware is designed and built properly.", prompt: `Two or three flat organic blob shapes in green and lime on generous open cream.` },
+    },
+  },
 
   { id:50, cat:"Development", type:"Systems Integration", name:"CRM Integration",
     def:"The connection of websites, applications, and digital platforms to customer relationship management systems.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure weaves colored threads into a unified tapestry on a large loom, pulling strands from different sources and combining them into a coherent whole.`},
+    prompt:`A figure weaves colored threads into a unified tapestry on a large loom, pulling strands from different sources and combining them into a coherent whole.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just CRM configurers, we're customer data architects.", prompt: `Dense tangled ribbon loops in lime green, cyan, and teal overlapping, fills frame completely.` },
+      context: { headline: "How we think about CRM integration as the backbone of customer intelligence.", prompt: `Overlapping curved ribbon loops in green and teal on cream, moderate composition.` },
+      outcome: { headline: "What changes when CRM is integrated properly.", prompt: `Two or three curved ribbon loops in teal and lime on generous open cream.` },
+    },
+  },
 
   { id:51, cat:"Development", type:"Systems Integration", name:"ERP Integration",
     def:"The integration of enterprise resource planning systems with digital platforms and operational processes.",
     outcomes:["Continuity","Actualization"],
-    prompt:`A figure aligns large interlocking gears of a complex machine, pressing them together until they mesh smoothly into synchronized motion.`},
+    prompt:`Abstract pattern of large interlocking gear forms in cobalt blue, terracotta, and olive, tessellated together in a synchronized mechanical arrangement.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just ERP connectors, we're operational data architects.", prompt: `Dense nested organic contour waves in teal, green, and lime on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about ERP integration as operational leverage.", prompt: `Flowing topographic contour curves in cyan and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when ERP is integrated properly.", prompt: `Sparse organic contour lines in lime and green on generous open cream.` },
+    },
+  },
 
   { id:52, cat:"Development", type:"Systems Integration", name:"Marketing Automation Integration",
     def:"The integration of marketing platforms, workflows, and automation systems with digital experiences.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure stands on a wide stage, arms raised and gesturing expressively as layered sound waves ripple outward from their conducting motions in all directions.`},
+    prompt:`Abstract composition of layered signal waves and branching pathways in cobalt blue and golden yellow, flowing outward from a central source in organized expanding tiers.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just automation configurers, we're marketing stack architects.", prompt: `Dense scattered squiggly wavy lines in teal, lime, and cyan on cream, fills frame.` },
+      context: { headline: "How we think about marketing automation integration as lifecycle infrastructure.", prompt: `Loose scattered wavy lines in green and teal on off-white, moderate loose composition.` },
+      outcome: { headline: "What changes when marketing automation is integrated properly.", prompt: `A few loose squiggly lines in lime and cyan on generous open cream.` },
+    },
+  },
 
   { id:53, cat:"Development", type:"Systems Integration", name:"Ecommerce Integration",
     def:"The connection of ecommerce platforms with operational, marketing, fulfillment, and customer management systems.",
     outcomes:["Growth","Continuity"],
-    prompt:`A figure oversees a busy conveyor system, directing products through multiple labeled stations — payment, fulfillment, delivery — each flowing in connected sequence.`},
+    prompt:`A figure oversees a busy conveyor system, directing products through multiple labeled stations — payment, fulfillment, delivery — each flowing in connected sequence.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just platform connectors, we're commerce operations architects.", prompt: `Dense nested concentric arcs in lime green, cyan, and teal on cream, tight dense crop.` },
+      context: { headline: "How we think about ecommerce integration as operational leverage.", prompt: `Concentric arc bands in teal and lime on off-white, moderate composition.` },
+      outcome: { headline: "What changes when ecommerce systems are integrated properly.", prompt: `Sparse concentric arcs in green and cyan on generous open cream.` },
+    },
+  },
 
   { id:54, cat:"Strategy", type:"UX Audit", name:"User Journey Optimization",
     def:"The evaluation and improvement of user pathways, interactions, and conversion experiences to reduce friction and improve outcomes.",
     outcomes:["Growth","Actualization"],
-    prompt:`A figure rolls boulders off a winding path, each cleared obstacle making the route ahead straighter and more passable.`},
+    prompt:`A figure rolls boulders off a winding path, each cleared obstacle making the route ahead straighter and more passable.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just UX fixers, we're journey architects.", prompt: `Large sweeping S-curve ribbon with parallel echo lines in orange, pink, and blue, fills frame edge to edge.` },
+      context: { headline: "How we think about user journey as a connected system.", prompt: `Flowing S-curve ribbon with echo lines in yellow, orange, and violet on cream, moderate crop.` },
+      outcome: { headline: "What changes when user journeys are optimized.", prompt: `Single S-curve ribbon in pink and orange on generous open cream.` },
+    },
+  },
 
   { id:55, cat:"Strategy", type:"Brand Positioning", name:"Brand Positioning Strategy",
     def:"The development of a differentiated market position that clarifies why an organization exists, who it serves, and why it matters.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure plants a flag confidently on a distinct hilltop, posture upright and certain, the surrounding terrain visible below stretching to the horizon.`},
+    prompt:`A figure plants a flag confidently on a distinct hilltop, posture upright and certain, the surrounding terrain visible below stretching to the horizon.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just positioning consultants, we're market clarity builders.", prompt: `Bold wide parallel diagonal bands in orange, blue, and red, tight edge-to-edge composition.` },
+      context: { headline: "How we think about positioning as organizational clarity.", prompt: `Parallel diagonal bands in violet, orange, and teal on cream, moderate view.` },
+      outcome: { headline: "What changes when positioning is clear and grounded.", prompt: `Two wide parallel bands in orange and blue on generous open cream.` },
+    },
+  },
 
   { id:56, cat:"Strategy", type:"Brand Positioning", name:"Messaging Architecture",
     def:"The development of structured messaging frameworks that communicate value consistently across channels and audiences.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure constructs a layered tower from structured panels, each level adding a new tier as the completed sections extend outward.`},
+    prompt:`A figure constructs a layered tower from structured panels, each level adding a new tier as the completed sections extend outward.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just copywriters, we're message architects.", prompt: `Dense nested organic contour waves in orange, blue, and red on cream, fills frame completely.` },
+      context: { headline: "How we think about messaging as organizational communication infrastructure.", prompt: `Flowing topographic contour curves in violet, yellow, and teal on off-white, moderate composition.` },
+      outcome: { headline: "What changes when messaging architecture is in place.", prompt: `Sparse organic contour lines in orange and blue on generous open cream.` },
+    },
+  },
 
   { id:57, cat:"Strategy", type:"Product / Service Definition", name:"Product Strategy",
     def:"The evaluation, definition, and structuring of products to improve market fit, positioning, and organizational alignment.",
     outcomes:["Actualization","Growth"],
-    prompt:`A figure shapes raw formless clay on a large workbench into a precisely defined object, smoothing and refining the form with both hands.`},
+    prompt:`A figure shapes raw formless clay on a large workbench into a precisely defined object, smoothing and refining the form with both hands.`,
+    storyBlock: {
+      diff:    { headline: "Why we aren't just strategists, we're product clarity partners.", prompt: `Dense flat organic blob shapes in orange, blue, and hot pink on cream, fills frame edge to edge.` },
+      context: { headline: "How we think about product strategy as organizational direction.", prompt: `Overlapping flat organic blob forms in yellow, teal, and orange on off-white, moderate composition.` },
+      outcome: { headline: "What changes when product strategy is clearly defined.", prompt: `Two or three flat organic blob shapes in red and blue on generous open cream.` },
+    },
+  },
 ];
 
 // ─── STATE ──────────────────────────────────────────────────────────────────
 let currentId = 1;
+let currentBlock = 'hero'; // 'hero' | 'story'
 let filtered  = [...SERVICES];
 let autoGenTimer = null;
 
@@ -931,6 +1399,14 @@ const imgKey  = id => `tf_img_${id}`;
 const getImg  = id => { try { return localStorage.getItem(imgKey(id)); } catch(e){ return null; } };
 const saveImg = (id, v) => { try { localStorage.setItem(imgKey(id), v); } catch(e){ console.warn('Storage full'); } };
 const delImg  = id => { try { localStorage.removeItem(imgKey(id)); } catch(e){}; };
+
+const storyKey   = (id, slot) => `tf_simg_${id}_${slot}`;
+const getStImg   = (id, slot)  => { try { return localStorage.getItem(storyKey(id,slot))||null; } catch(e){ return null; } };
+const saveStImg  = (id, slot, url) => { try { localStorage.setItem(storyKey(id,slot),url); } catch(e){} };
+const clearStImg = (id, slot)  => { try { localStorage.removeItem(storyKey(id,slot)); } catch(e){} };
+
+// ─── STORY STYLE ─────────────────────────────────────────────────────────────
+const STORY_STYLE = 'Bold flat graphic illustration. No figures, no people, no text, no symbols. Thick flowing organic curves, ribbons, and bands — may take the form of dense nested contour waves, bold parallel color stripes, scattered loose squiggly lines, flat organic blob shapes, single sweeping S-curve ribbons, tangled ribbon loops, or nested concentric arcs. Bright saturated colors on a cream or off-white background. Flat clean illustration with no grain, no noise, and no texture. Retro groovy aesthetic. Every image should look visually distinct from the others in this set.';
 
 // ─── WORKER CONFIG ────────────────────────────────────────────────────────────
 // Set this to your Cloudflare Worker URL after deploying
@@ -951,11 +1427,11 @@ function toggleStylePopover() {
 }
 
 // ─── STYLE REFERENCE IMAGES ──────────────────────────────────────────────────
-function loadStyleRefs() {
-  try { return JSON.parse(localStorage.getItem('tf_style_refs') || '[]'); }
-  catch { return []; }
-}
-function saveStyleRefs(arr) { localStorage.setItem('tf_style_refs', JSON.stringify(arr)); }
+// Stored in memory only — style refs are session-scoped and base64 data is
+// too large to reliably fit in localStorage alongside generated images.
+let _styleRefs = [];
+function loadStyleRefs() { return _styleRefs; }
+function saveStyleRefs(arr) { _styleRefs = arr; }
 
 function renderStyleRefs() {
   const thumbs = document.getElementById('styleRefThumbs');
@@ -965,9 +1441,19 @@ function renderStyleRefs() {
   thumbs.innerHTML = refs.map((src, i) => `
     <div class="style-ref-thumb">
       <img src="${src}" alt="Ref ${i+1}">
-      <button class="style-ref-del" onclick="removeStyleRefImage(${i})" title="Remove">✕</button>
+      <button class="style-ref-del" onclick="removeStyleRefImage(${i});event.stopPropagation();event.preventDefault()" title="Remove">✕</button>
     </div>`).join('');
-  if (placeholder) placeholder.style.display = refs.length ? 'none' : '';
+  if (placeholder) {
+    if (refs.length) {
+      placeholder.textContent = '＋ Add more';
+      placeholder.style.flex = '0 0 auto';
+      placeholder.style.padding = '4px 8px';
+    } else {
+      placeholder.textContent = 'Click or drag & drop images here';
+      placeholder.style.flex = '';
+      placeholder.style.padding = '';
+    }
+  }
 }
 
 function addStyleRefImages(files) {
@@ -993,10 +1479,6 @@ function removeStyleRefImage(idx) {
   renderStyleRefs();
 }
 
-function styleRefZoneClick(e) {
-  if (e.target.closest('.style-ref-del')) return; // let X buttons handle themselves
-  document.getElementById('styleRefInput')?.click();
-}
 
 function styleRefDragOver(e) {
   e.preventDefault();
@@ -1027,6 +1509,8 @@ document.addEventListener('click', e => {
 });
 
 // ─── GALLERY ─────────────────────────────────────────────────────────────────
+let currentGalleryTab = 'hero';
+
 function openGallery() {
   renderGallery();
   document.getElementById('galleryModal').classList.add('open');
@@ -1036,9 +1520,22 @@ function closeGallery() {
   document.getElementById('galleryModal').classList.remove('open');
 }
 
+function switchGalleryTab(tab) {
+  currentGalleryTab = tab;
+  document.getElementById('galTabHero').classList.toggle('active', tab === 'hero');
+  document.getElementById('galTabStory').classList.toggle('active', tab === 'story');
+  renderGallery();
+}
+
 function renderGallery() {
   const grid = document.getElementById('galleryGrid');
   if (!grid) return;
+  if (currentGalleryTab === 'story') {
+    grid.classList.add('gallery-grid--story');
+    renderStoryGallery(grid);
+    return;
+  }
+  grid.classList.remove('gallery-grid--story');
   grid.innerHTML = SERVICES.map(s => {
     const img = getImg(s.id);
     const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
@@ -1060,9 +1557,50 @@ function renderGallery() {
   }).join('');
 }
 
-function triggerDownload(dataUrl, fname) {
-  const ext = dataUrl.startsWith('data:image/webp') ? 'webp' : dataUrl.startsWith('data:image/jpeg') ? 'jpg' : 'png';
-  fetch(dataUrl)
+function renderStoryGallery(grid) {
+  const SLOTS = [
+    { key: 'diff',    label: 'Differentiation' },
+    { key: 'context', label: 'Context' },
+    { key: 'outcome', label: 'Outcome' },
+  ];
+  grid.innerHTML = SERVICES.map(s => {
+    const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+    const catClass = s.cat.toLowerCase();
+    const slotHTML = SLOTS.map(slot => {
+      const img = getStImg(s.id, slot.key);
+      return `
+        <div class="story-gal-slot">
+          <div class="story-gal-img">
+            ${img
+              ? `<img src="${img}" alt="${s.name} ${slot.label}">`
+              : `<div class="story-gal-empty">No image</div>`}
+          </div>
+          <div class="story-gal-foot">
+            <span class="story-gal-label">${slot.label}</span>
+            <button class="gal-dl" ${!img ? 'disabled' : ''} onclick="storyGalDownload(${s.id},'${slot.key}','${fname}')">↓</button>
+          </div>
+        </div>`;
+    }).join('');
+    return `
+      <div class="story-gal-group">
+        <div class="story-gal-head">
+          <span class="cat-tag ${catClass}" style="font-size:9px;padding:1px 5px">${s.cat}</span>
+          <span class="story-gal-svc-name">${s.name}</span>
+        </div>
+        <div class="story-gal-slots">${slotHTML}</div>
+      </div>`;
+  }).join('');
+}
+
+function storyGalDownload(id, slot, fname) {
+  const img = getStImg(id, slot);
+  if (!img) return;
+  triggerDownload(img, fname + '-' + slot);
+}
+
+function triggerDownload(src, fname) {
+  const ext = src.startsWith('data:image/webp') ? 'webp' : src.startsWith('data:image/jpeg') ? 'jpg' : 'png';
+  fetch(src)
     .then(r => r.blob())
     .then(blob => {
       const url = URL.createObjectURL(blob);
@@ -1071,6 +1609,10 @@ function triggerDownload(dataUrl, fname) {
       document.body.appendChild(a); a.click();
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+    })
+    .catch(() => {
+      // CORS blocks direct fetch of remote URL — open in new tab as fallback
+      window.open(src, '_blank');
     });
 }
 
@@ -1138,6 +1680,20 @@ document.addEventListener('keydown', e => {
 });
 
 function bulkDownload() {
+  if (currentGalleryTab === 'story') {
+    const SLOTS = ['diff','context','outcome'];
+    const items = [];
+    SERVICES.forEach(s => {
+      const fname = s.name.replace(/[^a-z0-9]/gi, '-').toLowerCase();
+      SLOTS.forEach(slot => {
+        const img = getStImg(s.id, slot);
+        if (img) items.push({ img, fname: fname + '-' + slot });
+      });
+    });
+    if (!items.length) { alert('No story block images generated yet.'); return; }
+    items.forEach((item, i) => setTimeout(() => triggerDownload(item.img, item.fname), i * 300));
+    return;
+  }
   const generated = SERVICES.filter(s => getImg(s.id));
   if (!generated.length) { alert('No images generated yet.'); return; }
   generated.forEach((s, i) => {
@@ -1231,7 +1787,7 @@ function selectService(id) {
   renderCard();
 
   // Auto-generate if no image
-  if (!getImg(id)) {
+  if (!getImg(id) && currentBlock === 'hero') {
     const cap = id;
     autoGenTimer = setTimeout(() => {
       if (currentId === cap) generateImage();
@@ -1242,6 +1798,146 @@ function selectService(id) {
 // ─── ICONS ───────────────────────────────────────────────────────────────────
 const ICON_COPY  = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
 const ICON_CHECK = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+// ─── STORY BLOCK ─────────────────────────────────────────────────────────────
+function renderStorySlots(s) {
+  if (!s.storyBlock) return '<div class="img-empty" style="padding:24px">No story block data for this service.</div>';
+  const slots = [
+    { key:'diff',    label:'Differentiation', headline:s.storyBlock.diff.headline,    prompt:s.storyBlock.diff.prompt    },
+    { key:'context', label:'Context',          headline:s.storyBlock.context.headline, prompt:s.storyBlock.context.prompt },
+    { key:'outcome', label:'Outcome',          headline:s.storyBlock.outcome.headline, prompt:s.storyBlock.outcome.prompt },
+  ];
+  return slots.map(slot => `
+    <div class="story-slot" id="story-slot-${slot.key}">
+      <div class="story-slot-img">
+        <div class="story-img-body" id="storyImgBody-${slot.key}"></div>
+        <div class="story-slot-upload">or <label>upload<input type="file" accept="image/*" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap" onchange="handleStoryUpload(this,'${slot.key}')"></label></div>
+      </div>
+      <div class="story-slot-ctrl">
+        <div class="story-slot-label">${slot.label}</div>
+
+        <div class="preview-lbl-row" style="margin-top:4px">
+          <span class="preview-lbl">Copy</span>
+        </div>
+        <div class="story-copy-text">${slot.headline}</div>
+
+        <div class="preview-lbl-row">
+          <span class="preview-lbl">Image prompt</span>
+        </div>
+        <textarea class="story-prompt-ta" id="storyPromptTA-${slot.key}" oninput="updateStoryPreview('${slot.key}')">${slot.prompt}</textarea>
+
+        <div class="preview-lbl-row">
+          <span class="preview-lbl">Full prompt</span>
+          <div class="sec-actions">
+            <button class="btn btn-icon" id="storyCopyBtn-${slot.key}" onclick="copyStoryPrompt('${slot.key}')" title="Copy full prompt">${ICON_COPY}</button>
+          </div>
+        </div>
+        <textarea class="preview-box" id="storyPreview-${slot.key}" spellcheck="false" readonly placeholder="Full prompt will appear here…"></textarea>
+
+        <div class="story-slot-actions" style="margin-top:4px">
+          <button class="btn accent" onclick="generateStoryImage('${slot.key}')">Generate</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateStoryPreview(slot) {
+  const ta      = document.getElementById('storyPromptTA-' + slot);
+  const preview = document.getElementById('storyPreview-' + slot);
+  if (!ta || !preview) return;
+  preview.value = [STORY_STYLE, ta.value.trim()].filter(Boolean).join('. ');
+}
+
+function updateStoryPreviews() {
+  ['diff', 'context', 'outcome'].forEach(updateStoryPreview);
+}
+
+function renderStoryImgBodies() {
+  ['diff','context','outcome'].forEach(slot => {
+    const body = document.getElementById('storyImgBody-' + slot);
+    if (!body) return;
+    const img = getStImg(currentId, slot);
+    if (img) {
+      body.innerHTML = `<div class="img-result"><img src="${img}" alt="${slot}"><div class="img-btns"><button class="ib dl" onclick="downloadStoryImg('${slot}')">↓</button><button class="ib del" onclick="clearStorySlot('${slot}')">✕</button></div></div>`;
+    } else {
+      body.innerHTML = '<div class="img-empty" style="font-size:10px;padding:12px;color:var(--text3)">No image yet</div>';
+    }
+  });
+}
+
+function switchBlock(block) {
+  currentBlock = block;
+  renderCard();
+}
+
+async function generateStoryImage(slot) {
+  const capId = currentId;
+  const body = document.getElementById('storyImgBody-' + slot);
+  if (body) body.innerHTML = '<div class="img-gen-state"><div class="big-spin"></div><div class="gen-txt" style="font-size:11px">Generating…</div></div>';
+  const corePrompt = (document.getElementById('storyPromptTA-' + slot)?.value || '').trim();
+  const style = STORY_STYLE;
+  const prompt = [style, corePrompt].filter(Boolean).join('. ');
+  const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
+  const refs = loadStyleRefs();
+  const payload = { prompt, image_size: imageSize };
+  if (refs.length > 0) { payload.style_ref = refs[0]; payload.style_strength = 0.4; }
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = data.error ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) : ('Error ' + res.status);
+      throw new Error(msg);
+    }
+    if (!data.imageUrl) throw new Error('No image returned');
+    if (currentId !== capId) return;
+    saveStImg(capId, slot, data.imageUrl);
+    const b2 = document.getElementById('storyImgBody-' + slot);
+    if (b2) b2.innerHTML = `<div class="img-result"><img src="${data.imageUrl}" alt="${slot}"><div class="img-btns"><button class="ib dl" onclick="downloadStoryImg('${slot}')">↓</button><button class="ib del" onclick="clearStorySlot('${slot}')">✕</button></div></div>`;
+  } catch(err) {
+    if (currentId !== capId) return;
+    const b2 = document.getElementById('storyImgBody-' + slot);
+    if (b2) b2.innerHTML = '<div class="img-error" style="font-size:10px;padding:8px"><strong>Failed:</strong> ' + err.message + '</div>';
+  }
+}
+
+function clearStorySlot(slot) {
+  clearStImg(currentId, slot);
+  const body = document.getElementById('storyImgBody-' + slot);
+  if (body) body.innerHTML = '<div class="img-empty" style="font-size:10px;padding:12px;color:var(--text3)">No image yet</div>';
+}
+
+function downloadStoryImg(slot) {
+  const img = getStImg(currentId, slot);
+  if (!img) return;
+  const s = SERVICES.find(x => x.id === currentId);
+  const fname = (s ? s.name.replace(/[^a-z0-9]/gi,'-').toLowerCase() : 'service') + '-' + slot;
+  triggerDownload(img, fname);
+}
+
+function handleStoryUpload(input, slot) {
+  const file = input.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    saveStImg(currentId, slot, e.target.result);
+    const body = document.getElementById('storyImgBody-' + slot);
+    if (body) body.innerHTML = `<div class="img-result"><img src="${e.target.result}" alt="${slot}"><div class="img-btns"><button class="ib dl" onclick="downloadStoryImg('${slot}')">↓</button><button class="ib del" onclick="clearStorySlot('${slot}')">✕</button></div></div>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function copyStoryPrompt(slot) {
+  const preview = document.getElementById('storyPreview-' + slot);
+  if (!preview) return;
+  navigator.clipboard.writeText(preview.value).catch(()=>{});
+  const btn = document.getElementById('storyCopyBtn-' + slot);
+  if (btn) { btn.innerHTML = ICON_CHECK; setTimeout(()=>{ btn.innerHTML = ICON_COPY; }, 1500); }
+}
 
 // ─── CARD RENDER ─────────────────────────────────────────────────────────────
 function renderNav() {
@@ -1270,24 +1966,7 @@ function renderCard() {
   const pos  = all.indexOf(s.id);
   const cc   = s.cat.toLowerCase();
 
-  document.getElementById('serviceCard').innerHTML = `
-
-    <!-- Header — outside the card surface -->
-    <div class="card-head">
-      <div class="card-meta">
-        <span class="cat-tag ${cc}">${s.cat}</span>
-        <span class="svc-type">${s.type}</span>
-        <span class="card-pos">${pos+1} / ${SERVICES.length}</span>
-      </div>
-      <div class="card-name">${s.name}</div>
-      <div class="card-def">${s.def}</div>
-      <div class="card-chips">
-        ${s.outcomes.map(o => `<span class="chip">${o}</span>`).join('')}
-      </div>
-    </div>
-
-    <!-- Card surface — image + controls only -->
-    <div class="svc-card">
+  const heroHTML = `
       <div class="card-body">
 
         <!-- LEFT: image column -->
@@ -1338,12 +2017,43 @@ function renderCard() {
             </div>
           </div>
         </div>
+      </div>`;
+
+  const storyHTML = `<div class="story-block" id="storyBlockEl">${renderStorySlots(s)}</div>`;
+
+  document.getElementById('serviceCard').innerHTML = `
+
+    <!-- Header — outside the card surface -->
+    <div class="card-head">
+      <div class="card-meta">
+        <span class="cat-tag ${cc}">${s.cat}</span>
+        <span class="svc-type">${s.type}</span>
+        <span class="card-pos">${pos+1} / ${SERVICES.length}</span>
       </div>
+      <div class="card-name">${s.name}</div>
+      <div class="card-def">${s.def}</div>
+      <div class="card-chips">
+        ${s.outcomes.map(o => `<span class="chip">${o}</span>`).join('')}
+      </div>
+      <div class="block-tabs">
+        <button class="block-tab ${currentBlock==='hero'?'active':''}" onclick="switchBlock('hero')">Hero</button>
+        <button class="block-tab ${currentBlock==='story'?'active':''}" onclick="switchBlock('story')">Story Block</button>
+      </div>
+    </div>
+
+    <!-- Card surface — image + controls only -->
+    <div class="svc-card">
+      ${currentBlock === 'hero' ? heroHTML : storyHTML}
     </div>`;
 
   renderNav();
-  updatePreview();
-  renderImgBody();
+  if (currentBlock === 'hero') {
+    updatePreview();
+    renderImgBody();
+  } else {
+    renderStoryImgBodies();
+    updateStoryPreviews();
+  }
 }
 
 // ─── IMAGE AREA ───────────────────────────────────────────────────────────────
@@ -1411,15 +2121,21 @@ async function generateImage() {
 
   const prompt    = buildPrompt();
   const imageSize = document.getElementById('aspectRatio')?.value || 'landscape_16_9';
+  const refs      = loadStyleRefs();
+  const payload   = { prompt, image_size: imageSize };
+  if (refs.length > 0) { payload.style_ref = refs[0]; payload.style_strength = 0.4; }
 
   try {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, image_size: imageSize })
+      body: JSON.stringify(payload)
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || `Error ${res.status}`);
+    if (!res.ok) {
+      const msg = data.error ? (typeof data.error === 'string' ? data.error : JSON.stringify(data.error)) : `Error ${res.status}`;
+      throw new Error(msg);
+    }
     if (!data.imageUrl) throw new Error('No image returned');
 
     if (currentId !== capId) return;
@@ -1518,5 +2234,9 @@ function copyBasePrompt() {
   });
 }
 </script>
+<!-- Body-level file input: lives outside any container so no parent clipping can block the dialog -->
+<input type="file" id="styleRefInput" accept="image/*" multiple
+       style="position:fixed;left:-9999px;top:-9999px;opacity:0"
+       onchange="addStyleRefImages(this.files); this.value=''">
 </body>
 </html>
